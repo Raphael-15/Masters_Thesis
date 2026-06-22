@@ -60,14 +60,76 @@ Export_t = max(−Net_t, 0)
 
 Surplus PV after meeting load and available charging is exported under PVPC; export limits and curtailment are not part of the baseline.
 
-4) Rule‑based dispatch heuristic (summary)
+4) Rule‑based dispatch heuristic (detailed pseudocode)
 
-The Chapter‑4 baseline uses a deterministic set of heuristic rules applied each hour in sequence (example order):
-- Compute PV_t and Load_t for hour t and current S_{t-1}.
-- Priority: meet local load with PV (self‑consumption). Any remaining PV is used to charge the battery up to P_ch_max and S_max (respecting η_ch). If PV insufficient, battery may discharge to meet load subject to S_min and P_dis_max.
-- No grid charging: do not schedule charging from Import_t in the baseline.
-- OMIE threshold adjustment: if OMIE dispatch/price signal indicates an export‑penalty or threshold condition, adjust heuristic (for example, avoid charging from PV to export when price < threshold or prefer discharging when price > threshold). The heuristic logic is deterministic and transparent in Chapter 4 and written as simple conditional statements rather than optimisation.
-- Prevent simultaneous charge/discharge by priority rules (e.g., PV charge preferred; if both signals exist prefer discharge to avoid net export loops).
+The Chapter‑4 baseline uses a deterministic set of heuristic rules applied each hour in sequence. The pseudocode below captures the exact rule ordering used in Chapter 4 and can be used to reproduce the dispatch logic in a notebook or script.
+
+```python
+# Chapter 4: Deterministic hourly rule-based dispatch pseudocode
+# Inputs per hour t: PV_t (kWh), Load_t (kWh), S_prev (kWh)
+# Parameters: P_ch_max, P_dis_max (kW), S_min, S_max (kWh), eta_ch, eta_dis, omie_price_t, omie_threshold
+
+def dispatch_hour(t, PV_t, Load_t, S_prev, params):
+    # 1) Meet local load with PV first (self-consumption)
+    pv_to_load = min(PV_t, Load_t)
+    load_remaining = Load_t - pv_to_load
+    pv_remaining = PV_t - pv_to_load
+
+    # 2) Use remaining PV to charge battery (no grid charging)
+    if pv_remaining > 0 and S_prev < params.S_max:
+        # max charge energy this hour (kWh)
+        max_charge_energy = min(pv_remaining, params.P_ch_max, (params.S_max - S_prev) / params.eta_ch)
+        P_ch = max_charge_energy
+    else:
+        P_ch = 0.0
+
+    # 3) If PV insufficient to meet load, discharge battery to supply remaining load
+    if load_remaining > 0 and S_prev > params.S_min:
+        # available discharge energy this hour (kWh)
+        max_discharge_energy = min(load_remaining, params.P_dis_max, (S_prev - params.S_min) * params.eta_dis)
+        P_dis = max_discharge_energy
+        load_remaining -= P_dis
+    else:
+        P_dis = 0.0
+
+    # 4) OMIE threshold adjustment (optional):
+    # If omie signal indicates high price, prefer discharging (avoid export); if low price, avoid charging that leads to export.
+    if params.use_omie:
+        if params.omie_price_t > params.omie_threshold and P_dis == 0 and S_prev > params.S_min:
+            # opportunistic discharge to reduce imports or capture high price
+            extra_discharge = min(params.P_dis_max - P_dis, (S_prev - params.S_min) * params.eta_dis)
+            P_dis += extra_discharge
+        if params.omie_price_t < params.omie_threshold and P_ch > 0:
+            # avoid charging to create an export under low-price hours
+            # reduce charging if it would cause export after meeting load
+            projected_export = pv_remaining - P_ch
+            if projected_export > 0:
+                reduce = min(P_ch, projected_export)
+                P_ch -= reduce
+
+    # 5) Recompute SoC after charge/discharge
+    S_new = S_prev + params.eta_ch * P_ch - P_dis / params.eta_dis
+    S_new = min(max(S_new, params.S_min), params.S_max)
+
+    # 6) Net flow and final imports/exports
+    net = Load_t - PV_t - P_dis + P_ch
+    Import = max(net, 0.0)
+    Export = max(-net, 0.0)
+
+    # Return dispatch decisions and new state
+    return {
+        'P_ch': P_ch,
+        'P_dis': P_dis,
+        'S_new': S_new,
+        'Import': Import,
+        'Export': Export
+    }
+```
+
+Notes on the pseudocode and implementation details:
+- Units: in this pseudocode hourly energies (kWh) are used for clarity; if your implementation uses kW you may need to multiply/divide by the hour duration (Δt=1 h) consistently.
+- This pseudocode intentionally forbids simultaneous P_ch>0 and P_dis>0 by construction (charge only from PV_remaining; discharge only to meet load_remaining or OMIE opportunistic discharge).
+- The OMIE adjustment is a simple threshold example — Chapter 4 uses OMIE as a dispatch/label signal; adjust the threshold logic to match the exact rule you used in experiments.
 
 5) Economic outputs (Chapter‑4 focus)
 
