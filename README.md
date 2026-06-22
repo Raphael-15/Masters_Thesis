@@ -1,17 +1,17 @@
 # Techno-Economic Assessment of Co-Located PV and Battery Energy Storage Systems in Energy Communities
 
-This repository contains the data, documentation, and models supporting the Master's thesis titled: "Techno-Economic Assessment of Co-Located PV and Battery Energy Storage Systems in Energy Communities". The work evaluates the technical performance and economic viability of co-locating photovoltaic (PV) generation and battery energy storage systems (BESS) within energy communities using data-driven time-series analysis and scenario-based techno-economic modelling.
+This repository contains the data, documentation, and models supporting the Master's thesis titled: "Techno-Economic Assessment of Co-Located PV and Battery Energy Storage Systems in Energy Communities".
 
 ## Purpose
 
-The primary purpose of this repository is to collect and organise the inputs, models, and documentation needed to answer the thesis research questions: quantify how co-located PV+BESS affects energy balances in a community, determine key technical performance indicators (self-consumption, self-sufficiency, curtailment), and evaluate the techno-economic outcomes (LCOE, NPV, payback) across scenarios and sensitivities.
+The primary purpose of this repository is to collect and organise the inputs, models, and documentation needed to answer the thesis research questions: quantify how co-located PV+BESS affects energy flows, economics, and resilience at the community scale under different configurations and tariff/incentive regimes.
 
 ## Systemic approach and pipeline
 
 1. Data ingestion and architecture
    - Load time-series consumption data are stored in the `SMEC/` directory (community/consumer load profiles).
    - PV generation scenarios are in the `Gen/` directory (zipped generation datasets and scenario bundles).
-   - Thesis documents (Table of contents, Introduction, Literature Review, Data Architecture, Methodology, Model Formulation) describe data formats, assumptions, and model choices.
+   - Thesis documents (Table of contents, Introduction, Literature Review, Data Architecture, Model Formulation) describe data formats, assumptions, and model choices.
 
 2. Pre-processing
    - Clean and align timestamps across load and generation datasets, handle missing data and aggregation/resampling as required by the modelling time-step.
@@ -19,7 +19,7 @@ The primary purpose of this repository is to collect and organise the inputs, mo
 
 3. Technical modelling
    - Create net-load profiles (load minus PV) for each scenario.
-   - Implement BESS operational model: SoC tracking, charge/discharge limits, round-trip efficiency, power/energy constraints, degradation assumptions, and an operational objective (e.g., maximise self-consumption, minimise peak import, or maximise arbitrage where applicable).
+   - Implement BESS operational model: SoC tracking, charge/discharge limits, round-trip efficiency, power/energy constraints, and an operational objective (e.g., maximise self-consumption or minimise cost).
    - Produce per-timestep outputs: battery dispatch, grid import/export, curtailed generation, SoC.
 
 4. Techno-economic modelling
@@ -34,6 +34,10 @@ The primary purpose of this repository is to collect and organise the inputs, mo
    - Time-series visualisations (net-load, SoC, dispatch), summary tables of KPIs per scenario, and figures/tables for thesis chapters.
    - Documentation links modelling choices to literature justification from `Literature Review.docx` and `Model_Formulation.docx`.
 
+## Important modelling note (base case)
+
+- Battery degradation is NOT modelled in the base-case simulations. The base-case operational runs and lifecycle economic results therefore omit capacity fade, cycle-related losses, and scheduled battery replacements. This is a stated limitation of the current analyses and may lead to optimistic long-term performance and NPV/LCOE estimates. Degradation can be enabled as an optional extension; see docs/Model_Formulation_equations.md for the optional throughput/cycle-based proxy and instructions.
+
 ## Files & folders (root-level)
 - README.md (this file)
 - `SMEC/` — load data (time-series for the case study community)
@@ -46,13 +50,11 @@ The primary purpose of this repository is to collect and organise the inputs, mo
 
 ## Excerpt from Introduction (abridged / selected paragraphs)
 
-The thesis investigates the techno-economic implications of co-locating photovoltaic generation with battery energy storage within energy communities. It frames the study around the needs of community-scale energy sharing and how combined PV+BESS systems can increase self-consumption, reduce peak demand on the distribution grid, and support higher shares of renewables without excessive curtailment.
+The thesis investigates the techno-economic implications of co-locating photovoltaic generation with battery energy storage within energy communities. It frames the study around the needs of community stakeholders, regulatory environments, and the role of distributed flexibility in reducing peak demand and improving self-consumption.
 
-The approach is data-driven: high-resolution load profiles for the community are combined with PV generation scenarios to produce net-load time series. A battery model with realistic operational constraints (power and energy limits, efficiency losses, and state-of-charge dynamics) is used to simulate dispatch under different objectives and control strategies. Economic analysis overlays the operational results with capital and operating cost assumptions to compute metrics such as NPV, payback, and levelized costs.
+The approach is data-driven: high-resolution load profiles for the community are combined with PV generation scenarios to produce net-load time series. A battery model with realistic operational constraints and efficiencies is used to simulate dispatch under different control strategies. Note: the base-case simulations do not include degradation unless explicitly enabled in the optional model extension.
 
-Scenario and sensitivity analyses are used to explore how results change with system sizing, varying cost assumptions, different tariff structures, and policy incentives. The thesis then synthesises technical and economic KPIs to answer the research questions and provide design and policy recommendations for energy communities considering co-located PV and storage.
-
-(Note: the above excerpt is an abridged selection of the Introduction content to keep the README concise. The full Introduction and related documents are available in the repository.)
+Scenario and sensitivity analyses are used to explore how results change with system sizing, varying cost assumptions, different tariff structures, and policy incentives. The thesis then synthesises scenario outcomes to provide recommendations on sizing and policy design.
 
 ## How to reproduce (high-level)
 1. Prepare the environment: install required Python/R packages for time-series analysis, optimisation (if present), and plotting.
@@ -69,4 +71,4 @@ Scenario and sensitivity analyses are used to explore how results change with sy
 
 ---
 
-If you want, I will now commit this README.md to the repository default branch (I have prepared this change). I can also extract a slightly longer 1–2 page excerpt from `Introduction .docx` or create an example notebook that runs a single scenario. Which would you like next?
+If you want, I can also add a short markdown note to the Introduction (docs/Introduction_note.md) stating the same limitation, or I can update the Word document itself. Tell me whether you prefer (A) a small docs/Introduction_note.md (safe, reversible), or (B) an in-place edit to "Introduction .docx" to add the limitation directly into the Word file.
