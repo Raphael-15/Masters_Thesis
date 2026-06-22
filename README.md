@@ -9,12 +9,12 @@ The primary purpose of this repository is to collect and organise the inputs, mo
 ## Systemic approach and pipeline
 
 1. Data ingestion and architecture
-   - Load time-series consumption data are stored in the `SMEC/` directory (community/consumer load profiles).
-   - PV generation scenarios are in the `Gen/` directory (zipped generation datasets and scenario bundles).
-   - Thesis documents (Table of contents, Introduction, Literature Review, Data Architecture, Model Formulation) describe data formats, assumptions, and model choices.
+   - Raw smart-meter, PV, price, and metadata files are stored in the Bronze layer (see docs/Data_Architecture.md for details).
+   - Cleaned and harmonized hourly datasets are stored in Silver, including hourly load, price, and PV Parquet files used as the model backbone.
+   - The Gold layer contains model-ready member-level and community-level tables used to simulate no-DER, PV-only, and PV–BESS scenarios.
 
 2. Pre-processing
-   - Clean and align timestamps across load and generation datasets, handle missing data and aggregation/resampling as required by the modelling time-step.
+   - Clean and align timestamps across load and generation datasets, handle missing data and aggregation/resampling as required by the modelling time-step (hourly).
    - Normalize units and ensure consistent time resolution for scenario runs.
 
 3. Technical modelling
@@ -40,8 +40,12 @@ The primary purpose of this repository is to collect and organise the inputs, mo
 
 ## Files & folders (root-level)
 - README.md (this file)
-- `SMEC/` — load data (time-series for the case study community)
-- `Gen/` — PV generation datasets and scenario zip files
+- `bronze/` — raw files: smart-meter, PV, price, metadata (raw CSV/ZIP or vendor formats)
+- `bronze/load_raw/` — raw load uploads (source-specific)
+- `bronze/pv_raw/` — raw PV scenario inputs
+- `silver/` — cleaned, harmonized hourly Parquet files (load, pv_hourly.parquet, prices)
+- `gold/` — model-ready aggregated/member-level tables for scenario runs
+- `docs/` — curated model excerpts and equations (includes Data_Architecture.md)
 - `Introduction .docx` — project introduction and scope
 - `Literature Review.docx` — review of related work and methodological justification
 - `Case_Study_and_Data_Architecture_CITED.docx` — case study description and data architecture (cited)
@@ -54,11 +58,9 @@ The thesis investigates the techno-economic implications of co-locating photovol
 
 The approach is data-driven: high-resolution load profiles for the community are combined with PV generation scenarios to produce net-load time series. A battery model with realistic operational constraints and efficiencies is used to simulate dispatch under different control strategies. Note: the base-case simulations do not include degradation unless explicitly enabled in the optional model extension.
 
-Scenario and sensitivity analyses are used to explore how results change with system sizing, varying cost assumptions, different tariff structures, and policy incentives. The thesis then synthesises scenario outcomes to provide recommendations on sizing and policy design.
-
 ## How to reproduce (high-level)
 1. Prepare the environment: install required Python/R packages for time-series analysis, optimisation (if present), and plotting.
-2. Place/verify data in `SMEC/` and `Gen/` and follow the Data Architecture document for file format expectations.
+2. Place/verify data in `bronze/` and `silver/` and follow the Data Architecture document for file format expectations.
 3. Run the pre-processing scripts to align timestamps and generate net-load profiles.
 4. Execute the BESS dispatch routine for each scenario and record outputs.
 5. Run the techno-economic analysis module to compute KPIs and aggregate scenario results.
@@ -70,5 +72,3 @@ Scenario and sensitivity analyses are used to explore how results change with sy
 - Consider adding example Jupyter notebooks that run a single scenario end-to-end (data load → dispatch → economic KPI) to make reproduction faster for reviewers.
 
 ---
-
-If you want, I can also add a short markdown note to the Introduction (docs/Introduction_note.md) stating the same limitation, or I can update the Word document itself. Tell me whether you prefer (A) a small docs/Introduction_note.md (safe, reversible), or (B) an in-place edit to "Introduction .docx" to add the limitation directly into the Word file.
