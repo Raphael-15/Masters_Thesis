@@ -24,3 +24,4 @@ Implementation notes
 - Use Silver hourly artifacts (silver/load_hourly.parquet, silver/pv_hourly.parquet, silver/prices_hourly.parquet) as inputs. Timestamps in Europe/Madrid and units in kWh (energy) / €/MWh (prices stored).
 - For full details, pseudocode, and extension notes (optimisation, degradation, grid charging), see docs/Model_Formulation_equations.md.
 
+Excerpt — see docs/Model_Formulation_equations.md for the full equations and dispatch pseudocode.
