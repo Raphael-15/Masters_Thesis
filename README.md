@@ -66,6 +66,9 @@ The approach is data-driven: high-resolution load profiles for the community are
 5. Run the techno-economic analysis module to compute KPIs and aggregate scenario results.
 6. Recreate figures/tables for thesis chapters from the results folder (exported CSVs/plots).
 
+## Reproducibility artifacts
+The repository includes reproducibility files, sample data, an executable example notebook, and a GitHub Actions smoke test to verify that the workflow runs successfully. The Python environment is defined through `requirements.txt` and `environment.yml`, while small example input files are provided under `data/sample/`. The notebook `notebooks/example_end_to_end.ipynb` demonstrates a minimal end-to-end workflow, and the GitHub Actions workflow in `.github/workflows/run_notebook.yml` automatically executes the notebook on push or pull request to confirm that the example runs without errors.
+
 ## Notes & recommended next steps
 - Convert the key Word documents (Introduction, Methodology, Model_Formulation) to plain text or markdown snippets for inclusion in analysis notebooks where needed.
 - Add a requirements.txt or environment.yml to capture reproducible environment specifications.
