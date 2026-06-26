@@ -1,0 +1,12 @@
+name: thesis-env
+channels:
+  - defaults
+dependencies:
+  - python=3.10
+  - pandas
+  - numpy
+  - matplotlib
+  - jupyterlab
+  - pyarrow
+  - nbconvert
+  - ipykernel
