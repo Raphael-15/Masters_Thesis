@@ -1,4 +1,4 @@
-# Techno-Economic Assessment of Co-Located PV and Battery Energy Storage Systems in Energy Communities
+# Techno-Economic Assessment of Shared PV and Battery Energy Storage Systems in Residential Collective Systems
 
 This repository contains the data, documentation, and models supporting the Master's thesis titled: "Techno-Economic Assessment of Co-Located PV and Battery Energy Storage Systems in Energy Communities".
 
