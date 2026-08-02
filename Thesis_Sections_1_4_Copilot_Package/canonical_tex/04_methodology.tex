@@ -1,0 +1,370 @@
+% =====================================================================
+% Chapter 4: Methodology
+% Content reorganised from the former Chapters 3, 4, and 6.
+% No substantive thesis content has been removed.
+% =====================================================================
+
+This section provides a general and reproducible methodological framework for evaluating shared photovoltaic and battery energy storage systems in grid-connected collective self-consumption arrangements. It illustrates the sequence from preparation of input data to hourly energy-flow simulation, participant-level allocation, monthly settlement, annual aggregation, validation, and making configuration comparison of No-DER, PV-only, and PV--BESS.
+
+The framework is structured independently of a particular location, community size, load dataset, PV capacity, or battery size. It can therefore be replicated for another energy community or collective self-consumption arrangement by replacing the parameters of case-specific demand, generation, price, tariff, allocation, and technology while retaining the same computational structure. The case of applying it in Seville and its numerical assumptions are presented separately in Section~\ref{sec:case-study}.
+
+\subsection{Methodological Process}
+\label{sec:overall_methodological_process}
+
+The methodological process consists of the following steps:
+
+\begin{enumerate}
+    \item \textbf{Define the system boundary and scenarios:} identify the participants, shared assets, simulation horizon, allocation rule, and the No-DER, PV-only, and PV--BESS configurations.
+    \item \textbf{Prepare and align the input data:} clean household demand, PV generation, price, tariff, and technology data; harmonise units, time zones, and temporal resolution.
+    \item \textbf{Calculate hourly member-level energy flows:} allocate shared PV, calculate direct self-consumption, residual demand, surplus generation, battery charge and discharge, state of charge, imports, and exports.
+    \item \textbf{Apply the settlement rules:} convert hourly member-level imports and exports into monthly costs and compensation, including any regulatory caps or carry-over restrictions.
+    \item \textbf{Aggregate annual outputs:} calculate annual bills, savings, self-consumption, self-sufficiency, battery throughput, cycling indicators, and inputs to the economic evaluation.
+    \item \textbf{Validate the model:} verify hourly energy conservation, state-of-charge limits, non-negativity, allocation closure, monthly compensation limits, and consistency between scenarios.
+    \item \textbf{Compare scenarios and test robustness:} isolate battery-specific value by comparing PV--BESS with PV-only under identical inputs and evaluate the selected sensitivity dimensions.
+\end{enumerate}
+
+Table~\ref{tab:ch3_model_flow} summarises the relationship between the main methodological layers.
+
+\begin{table}[htbp]
+\centering
+\caption{General methodological flow from input data to comparative outputs.}
+\label{tab:ch3_model_flow}
+\small
+\begin{tabular}{p{0.28\textwidth}p{0.62\textwidth}}
+\toprule
+\textbf{Layer} & \textbf{Description} \\
+\midrule
+Input and preparation layer & Household load profiles $L_{i,t}$; PV generation $G_t$; import and export prices; optional dispatch-price signal; allocation coefficients $\beta_i$; battery and economic parameters; data cleaning and temporal alignment. \\
+Scenario and hourly simulation layer & Calculate member-level load, allocated PV, direct self-consumption, battery charge and discharge, state of charge, grid import, and grid export for the No-DER, PV-only, and PV--BESS configurations. \\
+Monthly settlement layer & For each participant and billing month, calculate import cost, raw export compensation, applied compensation under the relevant settlement rule, and the net energy bill. \\
+Annual aggregation and validation layer & Aggregate annual bills, savings, SCR, SSR, battery throughput, cycling indicators, and economic inputs; verify energy balance, allocation closure, state-of-charge limits, and settlement constraints. \\
+Comparative evaluation layer & Calculate scenario differences, isolate battery-specific value against PV-only, and evaluate the selected sensitivity dimensions. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[!htbp]
+\centering
+\begin{tikzpicture}[
+  node distance=0.85cm,
+  box/.style={rectangle, rounded corners, draw=black!70, fill=black!3, align=center, text width=5.1cm, minimum height=0.9cm},
+  arrow/.style={-{Latex[length=3mm]}, thick}
+]
+\node[box] (input) {Input data and preprocessing\\Load, PV, prices, tariffs, allocation, parameters};
+\node[box, below=of input] (scenario) {Scenario definition\\No-DER, PV-only, and PV--BESS};
+\node[box, below=of scenario] (engine) {Hourly member-level simulation\\PV allocation, battery operation, imports, and exports};
+\node[box, below=of engine] (settlement) {Monthly settlement\\Import cost, export credit, and applicable cap};
+\node[box, below=of settlement] (outputs) {Annual aggregation and validation\\Bills, savings, SCR, SSR, cycling, and economic inputs};
+\node[box, below=of outputs] (comparison) {Comparative evaluation\\Battery-specific value and sensitivity analysis};
+\draw[arrow] (input) -- (scenario);
+\draw[arrow] (scenario) -- (engine);
+\draw[arrow] (engine) -- (settlement);
+\draw[arrow] (settlement) -- (outputs);
+\draw[arrow] (outputs) -- (comparison);
+\end{tikzpicture}
+\caption{Step-by-step methodological framework for shared PV--BESS assessment.}
+\label{fig:ch3_model_flow}
+\end{figure}
+
+This section applies the general methodological framework presented in Section~\ref{sec:formulation} to a representative residential collective self-consumption arrangement in Seville, Spain. It defines the application-specific system boundary, participant composition, input datasets, technology and economic parameters, settlement inputs, data-processing architecture, and quality controls.
+
+Seville is selected because of its high solar resource, Mediterranean climate, and relevance to collective self-consumption in Southern Europe. The case does not represent a specific existing community. Instead, it provides a transparent and technically consistent application through which the effects of Spanish tariff and settlement rules can be evaluated.
+
+The data architecture supports an hourly simulation over one representative year. Residential load, PV generation, electricity prices, tariff and compensation rules, and technology parameters are cleaned, harmonised, and converted into model-ready datasets before being passed to the methodology defined in Section~\ref{sec:formulation}.
+
+\subsection{Case Study Definition: Seville Energy Community}
+\label{sec:case_study_seville_energy_community}
+
+The case study represents a residential energy community configured under the Spanish collective self-consumption framework established by Real Decreto 244/2019 \cite{boe2019real}. The baseline community consists of 30 residential households located within a compact urban area in Seville. The community is assumed to satisfy the applicable proximity conditions in the consolidated version of RD~244/2019. For photovoltaic or wind installations up to 5~MW, the current consolidated text permits association through the grid at distances below 5,000~m; the 2~km case-study radius therefore remains within this boundary \cite{boe2019real}.
+
+The community includes a shared photovoltaic system and a centralized battery energy storage system. The PV system is sized through scenario analysis rather than fixed at a single value, allowing PV penetration to be tested as one of the key sensitivity dimensions. The battery is represented as a centralized lithium iron phosphate system with a baseline capacity of 150 kWh and a round-trip efficiency of 90\%. The system is operated using transparent rule-based dispatch rather than full optimization. This is appropriate for the thesis because the purpose is not to identify a mathematically optimal dispatch strategy, but to evaluate whether adding a battery creates incremental economic value under Spanish settlement rules \cite{iea2024international,nrel2024national}. 
+
+The community is treated as a cooperative or collectively managed arrangement in which shared generation and storage benefits are allocated among members through predefined rules. In the baseline case, static allocation coefficients are used. This means that each member receives a fixed share of the shared generation and associated benefits over the year. Dynamic allocation mechanisms are not included in the baseline case definition, which keeps the scope aligned with the research questions and avoids expanding the thesis into a broader governance-optimization study.
+
+The case-study definition directly supports the three research questions. First, the no-DER, PV-only, and PV--BESS comparison allows the economic viability of storage to be assessed. Second, the PV-only case provides the counterfactual needed to isolate battery-specific value. Third, the community size, PV penetration, and battery CAPEX assumptions can be varied to test the robustness of the results. The numerical values defined in this chapter instantiate the general variables, dispatch rules, allocation structure, and settlement equations presented in Section~\ref{sec:formulation}.
+
+\subsection{Community Composition and Load Profiles}
+\label{sec:community_composition_load_profiles}
+
+The community is composed of heterogeneous residential consumers. To represent this heterogeneity, households are divided into three consumption clusters: low, medium, and high consumption. This clustered representation preserves diversity in annual demand while keeping the model simple enough for transparent techno-economic analysis. The baseline composition is shown in Table~\ref{tab:ch3_baseline_community_composition}.
+
+\begin{table}[htbp]
+\centering
+\caption{Baseline community composition.}
+\label{tab:ch3_baseline_community_composition}
+\begin{tabular}{p{0.29\textwidth}p{0.18\textwidth}p{0.20\textwidth}p{0.21\textwidth}}
+\toprule
+\textbf{Cluster} & \textbf{Share of community} & \textbf{Number of households} & \textbf{Annual consumption range} \\
+\midrule
+Low consumption & 40\% & 12 & 1,500--2,500 kWh/year \\
+Medium consumption & 40\% & 12 & 2,500--4,000 kWh/year \\
+High consumption & 20\% & 6 & 4,000--6,500 kWh/year \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Low-consumption households represent small apartments or dwellings with limited appliance use. Medium-consumption households represent standard family homes with typical occupancy and appliance patterns. High-consumption households represent larger homes or dwellings with higher use of appliances, cooling, or other electricity-intensive end uses.
+
+Household demand profiles are constructed using empirical smart-meter data as a behavioural template. High-resolution smart-meter datasets are suitable for representing intra-day residential demand variability and for constructing household load archetypes \cite{f2015f}. However, the London Smart Meter dataset is not treated as geographically representative of Seville. Instead, it is used to preserve realistic residential load-shape variability, while annual consumption levels are rescaled to match the low, medium, and high consumption ranges defined above.
+
+The load-processing approach follows three principles. First, empirical household profiles are retained at individual-household level for as long as possible to preserve heterogeneity. Second, half-hourly or higher-frequency data are aggregated to hourly resolution to match the simulation backbone. Third, profiles are rescaled to Spanish annual consumption ranges and, where required, adjusted to reflect Seville-specific climatic conditions. This is important because Seville's hot summers may affect cooling-related demand, while the original London dataset reflects a different climate and behavioural context.
+
+Community composition is also a sensitivity dimension. In the baseline, the 40-40-20 distribution provides a balanced mix of household types. In sensitivity analysis, the relative share of low, medium, and high consumption members can be varied to test whether the economic value of PV--BESS depends on demand heterogeneity. This is directly relevant to RQ3, because storage value may increase when demand is more diverse and when evening consumption better aligns with stored PV energy.
+
+\subsection{PV Generation and Weather Data}
+\label{sec:pv_generation_weather_data}
+
+PV generation is represented through an hourly photovoltaic production profile for Seville. For consistency and reproducibility, the baseline PV profile is generated using the PVGIS non-interactive API, specifically the \texttt{seriescalc} tool for hourly grid-connected PV output. PVGIS is selected as the primary PV generation source because it directly provides PV power output for a defined system configuration, reducing the need to construct a full PV conversion model from raw irradiance variables. The European Commission's Joint Research Centre describes PVGIS as a tool for obtaining solar radiation and photovoltaic system performance information, and its API supports non-interactive access to PVGIS tools \cite{jrcndeuropean,jrcndeuropean2}.
+
+The baseline PV profile is generated for a normalized 1 kWp system and then scaled linearly to the required community PV capacity in each scenario. This allows different PV penetration levels to be evaluated without repeatedly changing the underlying weather year. The main PVGIS parameters are summarized in Table~\ref{tab:ch3_pv_profile_parameters}.
+
+\begin{table}[htbp]
+\centering
+\caption{Baseline PV profile parameters.}
+\label{tab:ch3_pv_profile_parameters}
+\begin{tabular}{p{0.38\textwidth}p{0.50\textwidth}}
+\toprule
+\textbf{Parameter} & \textbf{Baseline value} \\
+\midrule
+Location & Seville, Spain \\
+Latitude / longitude & 37.4$^\circ$N / -6.05$^\circ$ \\
+Radiation database & PVGIS-SARAH3 \\
+PV technology & Crystalline silicon \\
+Mounting type & Building / rooftop \\
+System losses & 14\% \\
+Tilt / azimuth & 30$^\circ$ / 0$^\circ$ south-facing \\
+Reference system size & 1 kWp \\
+Temporal resolution & Hourly \\
+Auxiliary validation data & Long-term GHI/DNI dataset and Open-Meteo/ERA5-Land weather file; not used as primary PV generation input \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The PVGIS output includes hourly PV power values, which are converted into hourly energy values. Since the simulation time step is one hour, PV energy in kWh is calculated by converting PV power from watts to kilowatts for each hourly step. The normalized 1 kWp output is then multiplied by the total installed PV capacity of the community scenario.
+
+Timestamps are handled carefully because PVGIS returns time-series data that must be aligned with local tariff and demand data. For tariff alignment and demand matching, timestamps are converted to Europe/Madrid time, with daylight-saving time handled explicitly. This is essential because electricity prices, PVPC settlement, household demand, and PV generation must all be joined on the same time index.
+
+Open-Meteo can be retained as an auxiliary source for irradiance and weather diagnostics. The Open-Meteo Historical Weather API provides long historical coverage with hourly resolution using reanalysis products \cite{openmeteondopen}. However, if Open-Meteo were used as the primary PV source, additional modelling steps would be required, including plane-of-array irradiance calculation, module temperature modelling, DC-to-AC conversion, inverter clipping, and system loss modelling. For this reason, PVGIS is used as the cleaner baseline PV production source, while Open-Meteo remains useful for plausibility checks or later sensitivity analysis.
+
+In addition to the PVGIS baseline profile, two auxiliary irradiance and weather datasets are retained for diagnostic and validation purposes: a long-term hourly GHI/DNI dataset and an Open-Meteo/ERA5-Land weather file for Seville. These datasets are not used as the primary PV generation input in the baseline simulation. Instead, they are used to support solar-resource characterization, check the plausibility of the PVGIS generation profile, and provide optional weather diagnostics. This avoids introducing a separate PV conversion model from raw irradiance data, while still allowing the PVGIS-based profile to be checked against independent solar-resource information.
+
+The selection of Seville is also supported by its solar-resource context. Published solar-resource work on Seville shows that the location has been used for detailed solar radiation assessment based on high-resolution radiometric measurements, making it a suitable Mediterranean case for solar-energy analysis \cite{s2016s}.
+
+\subsection{Electricity Price and Tariff Data}
+\label{sec:electricity_price_tariff_data}
+
+Electricity price data are required for two different purposes: operational dispatch and retail settlement. These two uses are separated in the data architecture to avoid mixing wholesale market prices with retail billing values.
+
+First, the OMIE day-ahead market price is used as the wholesale price signal. This price can guide battery dispatch and represent wholesale-indexed price scenarios. OMIE publishes day-ahead prices for the Spanish and Portuguese electricity systems by market period, including quarter-hourly periods in the current market design \cite{omiendday}. In the model, OMIE prices are stored at their native resolution where available and aggregated to hourly resolution for the main simulation. OMIE is used as a dispatch or wholesale signal, not as the direct valuation basis for PVPC imports or exports.
+
+Second, grid imports are valued using the selected hourly PVPC variable energy-price series for residential consumers. The baseline excludes fixed power charges, meter rental, taxes, and other non-energy items, because these components are not changed by hourly battery dispatch. Third, surplus exports are valued using the PVPC simplified-compensation export-credit series, specifically the ESIOS indicator for surplus self-consumption energy under the simplified compensation mechanism \cite{reendprecio}. The exact indicator identifiers, download dates, and units are recorded in Appendix~\ref{app:data-sources}.
+
+The simplified compensation mechanism is central to this thesis. Under Real Decreto 244/2019, surplus compensation is applied within the billing framework for eligible self-consumption consumers. The value credited for exported surplus is limited by the value of imported energy within the billing period, and the billing period cannot exceed one month \cite{boe2019real}. This monthly cap is one of the main reasons why the PV-only and PV--BESS comparison is necessary: a battery may create value by reducing surplus exports that would otherwise be credited at a lower value or limited by the cap.
+
+The price-processing procedure includes the following rules. OMIE and ESIOS series are retained in their published units in the Bronze layer. The Silver layer records the source unit explicitly and standardizes all price series to EUR/MWh; conversion to EUR/kWh occurs only in the billing calculation. Where 15-minute data are available, values are aggregated to hourly resolution using the arithmetic mean of the four quarter-hour values within each hour. Negative wholesale prices are preserved rather than deleted, because they may be relevant to storage value and price-volatility sensitivity. Validation checks are applied for completeness, duplicate timestamps, extreme spikes, and correct application of the monthly compensation cap.
+
+\subsection{Technology, Dispatch, and Economic Parameters}
+\label{sec:technology_economic_parameters}
+
+The general methodology in Section~\ref{sec:formulation} treats PV, BESS, dispatch, settlement, and financial quantities as configurable inputs. This subsection specifies the values used for the Seville application. These assumptions are based on literature, industry benchmarks, and sensitivity ranges \cite{iea2024international,nrel2024national,irena2025international}; they are not presented as universally valid values.
+
+The PV system is represented using crystalline-silicon technology in a fixed-tilt rooftop configuration. The baseline tilt is 30$^\circ$ with south-facing orientation. PV capacity is varied through the scenario design, while the normalised PVGIS profile is scaled to each installed capacity.
+
+The BESS is represented as a centralised LFP battery with a nominal energy capacity of 150~kWh, a 90\% round-trip efficiency, a 90\% depth of discharge, and a 0.5C charge and discharge rate. Equal one-way efficiencies are therefore $\sqrt{0.90}\approx0.9487$. The 0.5C limit gives maximum charge and discharge powers of 75~kW, while the 90\% depth of discharge gives a minimum state of charge of 15~kWh. The initial state of charge is set to 50\% of nominal capacity, or 75~kWh \cite{iea2024international,nrel2024national}.
+
+Battery degradation is not modelled explicitly; usable capacity and efficiency remain constant over the simulation period. This keeps the case study focused on tariff and settlement realism, battery-specific value, and CAPEX sensitivity rather than electrochemical ageing. The effect of this simplification is treated as a limitation.
+
+\begin{longtable}{p{0.22\textwidth}p{0.31\textwidth}p{0.37\textwidth}}
+\caption{Seville case-study technology, dispatch, settlement, and economic parameters.}\label{tab:ch3_technology_economic_parameters}\\
+\toprule
+\textbf{Category} & \textbf{Parameter} & \textbf{Baseline assumption} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Category} & \textbf{Parameter} & \textbf{Baseline assumption} \\
+\midrule
+\endhead
+Temporal & Simulation horizon & One complete non-leap calendar year; hourly resolution; $T=8760$ \\
+PV & Technology & Crystalline silicon \\
+PV & System losses & 14\% \\
+PV & Tilt / azimuth & 30$^\circ$ / south-facing \\
+PV & Capacity & Varied through PV-penetration scenarios \\
+BESS & Chemistry & LFP \\
+BESS & Nominal capacity & 150~kWh \\
+BESS & Round-trip efficiency & 90\% \\
+BESS & One-way efficiencies & $\eta^{\mathrm{ch}}=\eta^{\mathrm{dis}}\approx0.9487$ \\
+BESS & Depth of discharge & 90\% \\
+BESS & Minimum SOC & 15~kWh \\
+BESS & Initial SOC & 75~kWh, corresponding to 50\% of nominal capacity \\
+BESS & Charge/discharge rate & 0.5C \\
+BESS & Maximum charge/discharge power & 75~kW / 75~kW \\
+BESS & Charging source & Allocated PV surplus only; no grid charging \\
+Dispatch & Wholesale signal & Hourly OMIE day-ahead price \\
+Dispatch & Baseline discharge threshold & 75th percentile of the annual OMIE distribution \\
+Allocation & Participant coefficients & Static coefficients proportional to annual household demand \\
+Settlement & Import valuation & Selected hourly PVPC variable energy-price series \\
+Settlement & Export valuation & PVPC excedentaria export-credit series \\
+Settlement & Compensation limit & Monthly participant-level cap; no carry-over \\
+BESS & CAPEX & EUR 400--500/kWh central range; varied in sensitivity analysis \\
+Economic & Discount rate & 4\% real \\
+Economic & Project horizon & 15 years \\
+Economic & PV lifetime & 25 years \\
+Economic & BESS lifetime & 15 years \\
+Economic & PV CAPEX & EUR 1,000--1,200/kWp \\
+Economic & PV O\&M & EUR 15--20/kWp/year \\
+\bottomrule
+\end{longtable}
+
+The economic parameters are used in Section~\ref{sec:economic-framework} to calculate annual bill savings, NPV, payback period, and battery-specific economic value. Battery CAPEX is a principal sensitivity variable, and lower and higher values are tested to identify the conditions under which the incremental benefit of storage exceeds its additional cost.
+
+\subsection{Battery Dispatch Implementation}
+\label{sec:battery_dispatch_implementation}
+
+\subsubsection{Dispatch Pseudocode}
+\label{subsec:dispatch_pseudocode}
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.94\textwidth}
+\hrule\vspace{0.15cm}
+\small
+\begin{verbatim}
+FOR each hour t = 1,...,T:
+    allocate PV: G_alloc[i,t] = beta[i] * G[t]
+    direct_pv[i] = min(load[i,t], G_alloc[i,t])
+    surplus[i]   = max(G_alloc[i,t] - load[i,t], 0)
+    deficit[i]   = max(load[i,t] - G_alloc[i,t], 0)
+    U = sum_i surplus[i]
+    D = sum_i deficit[i]
+
+    charge = min(U, P_ch_max, (S_max - S_prev) / eta_ch)
+    S_after_ch = S_prev + eta_ch * charge
+
+    if D > 0 and OMIE[t] >= discharge_threshold:
+        discharge = min(D, P_dis_max,
+                        eta_dis * (S_after_ch - S_min))
+    else:
+        discharge = 0
+
+    S[t] = S_after_ch - discharge / eta_dis
+    allocate charge in proportion to member surplus
+    allocate discharge in proportion to member deficit
+    calculate member imports and exports
+    validate SOC, allocation closure, non-negativity and energy balance
+END FOR
+\end{verbatim}
+\vspace{0.15cm}\hrule
+\end{minipage}
+\caption{Allocation-consistent rule-based PV--BESS dispatch pseudocode.}
+\label{fig:ch4_dispatch_pseudocode}
+\end{figure}
+
+\subsubsection{Rationale and Limitations}
+\label{subsec:dispatch_rationale_limitations}
+
+The rule can be audited hour by hour and avoids hidden solver assumptions. It does not predict future PV, load, or prices beyond the established threshold, so it should be considered as a reproducible operating mechanism rather than an upper-bound optimum. In future work, a perfect-foresight optimization can be added as a benchmark, but should not replace the baseline without clearly differentiating between forecast information and realistic operation.
+
+\subsection{Data Processing Architecture}
+\label{sec:data_processing_architecture}
+
+The data architecture follows a Bronze--Silver--Gold structure. This structure is used to make the workflow transparent, reproducible, and auditable. It also prevents raw data, cleaned data, and model-ready data from being mixed.
+
+The Bronze layer stores raw input files exactly as downloaded. This includes smart-meter load files, OMIE and ESIOS price files, PVGIS hourly PV-output files, auxiliary GHI/DNI irradiance files, Open-Meteo diagnostic weather files, and metadata such as download date, source URL, units, time zone, and file hashes.
+
+The Silver layer contains cleaned and standardized data. At this stage, timestamps are normalized, units are harmonized, missing values are flagged, and all time series are converted or aggregated to hourly resolution. Load data are aggregated from half-hourly to hourly values where required. Price data are stored in EUR/MWh, and PV generation is stored in kWh per hour. Outliers and negative prices are flagged rather than automatically removed, because extreme market values can be economically meaningful for BESS value assessment.
+
+The Gold layer contains the final model-ready tables. These are the datasets used directly by the simulation model. The main Gold table is defined at the member-hour-scenario level and contains household load, allocated PV, BESS flows, grid imports, grid exports, prices, and bill components. A community-level rollup table is also retained for checking energy balance and battery state of charge.
+
+\begin{table}[htbp]
+\centering
+\caption{Data architecture summary.}
+\label{tab:ch3_data_architecture_summary}
+\begin{tabular}{p{0.20\textwidth}p{0.33\textwidth}p{0.35\textwidth}}
+\toprule
+\textbf{Layer} & \textbf{Purpose} & \textbf{Main contents} \\
+\midrule
+Bronze & Raw and immutable storage & Original load, PV, price, tariff, and metadata files \\
+Silver & Cleaned and standardized data & Hourly load, hourly PV, hourly prices, QA flags \\
+Gold & Model-ready simulation data & Member-hour-scenario tables, community rollups, bill components \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The Gold dataset is designed to support three scenarios: no-DER, PV-only, and PV--BESS. The no-DER case provides the baseline electricity cost without shared assets. The PV-only case measures the value of collective PV self-consumption under PVPC import/export rules. The PV--BESS case measures the additional value created when storage is added. The difference between PV--BESS and PV-only results is the basis for battery-specific value attribution.
+
+Battery-specific value is calculated using Equation~\eqref{eq:delta_x_bess}. The same load, PV generation, price series, tariff rules, allocation coefficients, and evaluation horizon are used in the PV-only and PV--BESS cases so that the incremental difference is attributable to the battery rather than to changes in other inputs.
+
+\subsection{Data Quality, Assumptions, and Limitations}
+\label{sec:data_quality_assumptions_limitations}
+
+Several data-quality checks are required before simulation. First, each hourly time series must contain the expected number of hourly records for the reference year. Second, all timestamps must be aligned to the same time zone, preferably Europe/Madrid for the model-facing dataset. Third, energy units must be consistent: load and PV generation in kWh, prices in EUR/MWh at the data-storage stage, and EUR/kWh in the billing-calculation stage. Fourth, load and PV values must be non-negative, while negative electricity prices should be allowed. Fifth, the community-level energy balance must be verified for each hour.
+
+The billing logic also requires specific validation. In each billing month, the applied export credit must not exceed the value of imported energy. The model should therefore store both the raw hourly export-credit value and the capped monthly applied credit. This makes it possible to quantify whether and when the compensation cap binds. This is important for RQ2 because one expected source of battery value is the reduction of surplus exports whose credit is limited by the monthly cap.
+
+The main limitation of the load dataset is geographic transferability. The London Smart Meter dataset provides useful empirical load shapes, but it does not directly represent Seville households. This limitation is addressed by treating the dataset as a behavioural template, rescaling annual demand to Spanish residential consumption ranges, and including community-composition sensitivity analysis.
+
+A second limitation concerns PV and weather data. PVGIS provides a reproducible hourly PV profile, but it remains a modelled estimate rather than measured generation from the specific rooftops of the community. Shading, roof availability, orientation diversity, inverter sizing, and local soiling are simplified through general loss assumptions. These assumptions are acceptable for a techno-economic thesis but should be acknowledged when interpreting absolute results. The auxiliary GHI/DNI and Open-Meteo datasets are therefore used only for solar-resource plausibility checks and weather diagnostics, not to replace the PVGIS \texttt{seriescalc} output used in the baseline simulation.
+
+A third limitation concerns technology costs. Battery and PV CAPEX values are uncertain and may vary significantly depending on market conditions, installer pricing, supply chains, and policy incentives. For this reason, the thesis should not rely on a single CAPEX assumption. Instead, CAPEX sensitivity analysis is required to identify threshold values at which PV--BESS becomes economically attractive.
+
+The broader modelling exclusions, including detailed distribution-network constraints and
+battery degradation, are defined in Sections~\ref{sec:introduction} and
+\ref{sec:formulation}.
+
+Overall, this section supplies the application-specific inputs required by the general methodology presented in Section~\ref{sec:formulation}. It defines the Seville system boundary, participant composition, data sources, parameter values, data-processing architecture, and quality controls needed to evaluate PV--BESS viability, isolate battery-specific value, and test sensitivity to community composition, PV penetration, and battery CAPEX.
+
+\subsection{Experimental Design and Sensitivity Analysis}
+\label{sec:experimental}
+
+This chapter defines the experimental design, sensitivity analysis framework, and validation procedures for the techno-economic model developed in Section~\ref{sec:formulation}. All scenarios are evaluated using consistent modelling assumptions, settlement rules, and performance indicators, so that the effects of PV penetration, battery CAPEX, electricity price conditions, community size and composition, and the monthly compensation cap can be compared transparently.
+
+\subsubsection{Scenario Design}
+\label{subsec:scenario_design}
+
+\subsubsection{PV Penetration Scenarios}
+\label{subsec:pv_penetration_scenarios}
+
+\subsubsection{Battery CAPEX Scenarios}
+\label{subsec:battery_capex_scenarios}
+
+\subsubsection{Electricity Price Sensitivity}
+\label{subsec:electricity_price_sensitivity}
+
+\subsubsection{Community Size and Composition Sensitivity}
+\label{subsec:community_size_composition_sensitivity}
+
+\subsubsection{Compensation Cap Assessment}
+\label{subsec:compensation_cap_assessment}
+
+\subsection{Validation and Robustness Assessment}
+\label{subsec:validation_robustness_assessment}
+
+\subsubsection{Validation Checks}
+\label{subsec:validation_checks}
+
+\begin{longtable}{p{0.34\textwidth}p{0.56\textwidth}}
+\caption{Model validation checks.}\label{tab:ch4_validation_checks}\\
+\toprule
+\textbf{Check} & \textbf{Condition} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Check} & \textbf{Condition} \\
+\midrule
+\endhead
+Hourly energy balance & $\left|G_t+I_t+P^{\mathrm{dis}}_t-L_t-E_t-P^{\mathrm{ch}}_t\right|\leq\varepsilon$ \\
+SOC bounds & $S_{\min}\leq S_t\leq S_{\max}$ \\
+Non-negativity & Loads, generation, imports, exports, charge and discharge are non-negative \\
+No simultaneous battery charge/discharge & $P^{\mathrm{ch}}_tP^{\mathrm{dis}}_t=0$ \\
+Member import/export exclusivity & $I_{i,t}E_{i,t}=0$ for every member and hour \\
+Allocation coefficients & $\sum_i\beta_i=1$ and $\beta_i\geq0$ \\
+Charge allocation closure & $\sum_iP^{\mathrm{ch,alloc}}_{i,t}=P^{\mathrm{ch}}_t$ \\
+Discharge allocation closure & $\sum_iP^{\mathrm{dis,alloc}}_{i,t}=P^{\mathrm{dis}}_t$ \\
+Flow aggregation & Member imports and exports equal community totals \\
+Monthly compensation cap & $R^{\mathrm{applied}}_{i,m}\leq C^{\mathrm{imp}}_{i,m}$ \\
+Zero-battery consistency & PV--BESS reproduces PV-only when usable battery capacity is zero \\
+Terminal SOC & $S_T-S_0$ is reported; cyclic-SOC sensitivity imposes $S_T=S_0$ \\
+\bottomrule
+\end{longtable}
+
+At aggregate community level, positive import and positive export can coexist because different participants may import and export in the same hour under static allocation. The exclusivity check is therefore applied at member level, not to the summed community flows.

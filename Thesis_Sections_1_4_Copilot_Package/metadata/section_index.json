@@ -1,0 +1,402 @@
+[
+  {
+    "chapter_number": 1,
+    "chapter_title": "Introduction",
+    "canonical_file": "canonical_tex/01_introduction.tex",
+    "sections": [
+      {
+        "level": 2,
+        "title": "Motivation",
+        "line": 1,
+        "label": "subsec:motivation"
+      },
+      {
+        "level": 2,
+        "title": "Background and Context",
+        "line": 31,
+        "label": "problem-definition-and-research-gap"
+      },
+      {
+        "level": 2,
+        "title": "Research Questions and Objectives",
+        "line": 128,
+        "label": null
+      },
+      {
+        "level": 2,
+        "title": "Scope of the Study",
+        "line": 160,
+        "label": null
+      }
+    ]
+  },
+  {
+    "chapter_number": 2,
+    "chapter_title": "Literature Review and Research Gap",
+    "canonical_file": "canonical_tex/02_literature_review.tex",
+    "sections": [
+      {
+        "level": 2,
+        "title": "Theoretical Framework",
+        "line": 1,
+        "label": "subsec:theoretical-framework"
+      },
+      {
+        "level": 2,
+        "title": "State of the Art",
+        "line": 504,
+        "label": "subsec:state-of-the-art"
+      },
+      {
+        "level": 2,
+        "title": "Research Gap",
+        "line": 783,
+        "label": "subsec:research-gap"
+      }
+    ]
+  },
+  {
+    "chapter_number": 3,
+    "chapter_title": "Mathematical Formulation for Energy Communities",
+    "canonical_file": "canonical_tex/03_mathematical_formulation.tex",
+    "sections": [
+      {
+        "level": 2,
+        "title": "Modelling Framework",
+        "line": 7,
+        "label": "sec:modelling_framework"
+      },
+      {
+        "level": 3,
+        "title": "Overall Approach",
+        "line": 10,
+        "label": "subsec:overall_approach"
+      },
+      {
+        "level": 3,
+        "title": "Regulatory and Settlement Boundary",
+        "line": 32,
+        "label": "subsec:regulatory_settlement_boundary"
+      },
+      {
+        "level": 2,
+        "title": "No-DER Baseline Scenario",
+        "line": 41,
+        "label": "sec:no_der_baseline_ch4"
+      },
+      {
+        "level": 3,
+        "title": "Energy Balance",
+        "line": 46,
+        "label": "subsec:no_der_energy_balance"
+      },
+      {
+        "level": 3,
+        "title": "Billing",
+        "line": 69,
+        "label": "subsec:no_der_billing"
+      },
+      {
+        "level": 2,
+        "title": "PV-Only Scenario",
+        "line": 89,
+        "label": "sec:pv_only_scenario_ch4"
+      },
+      {
+        "level": 3,
+        "title": "Static Member-Level Allocation",
+        "line": 94,
+        "label": "subsec:static_member_allocation_pv_only"
+      },
+      {
+        "level": 3,
+        "title": "Member-Level Energy Flows",
+        "line": 116,
+        "label": "subsec:member_level_energy_flows_pv_only"
+      },
+      {
+        "level": 3,
+        "title": "Energy Conservation and Performance Indicators",
+        "line": 141,
+        "label": "subsec:energy_conservation_indicators_pv_only"
+      },
+      {
+        "level": 2,
+        "title": "PV–BESS Scenario",
+        "line": 166,
+        "label": "sec:pv_bess_scenario_ch4"
+      },
+      {
+        "level": 3,
+        "title": "Allocation-Consistent Community Flow Definitions",
+        "line": 180,
+        "label": "subsec:allocation_consistent_flows"
+      },
+      {
+        "level": 3,
+        "title": "Community Energy Balance and State of Charge",
+        "line": 201,
+        "label": "subsec:bess_community_energy_balance"
+      },
+      {
+        "level": 3,
+        "title": "Battery Operating Bounds",
+        "line": 223,
+        "label": "subsec:battery_operating_bounds"
+      },
+      {
+        "level": 3,
+        "title": "Charging, Discharging, Import, and Export",
+        "line": 256,
+        "label": "subsec:community_surplus_import_export_self_consumption"
+      },
+      {
+        "level": 3,
+        "title": "Member-Level Allocation of Battery Flows",
+        "line": 308,
+        "label": "subsec:member_level_allocation_bess_flows"
+      },
+      {
+        "level": 2,
+        "title": "Battery Dispatch Logic",
+        "line": 349,
+        "label": "sec:battery_dispatch_logic"
+      },
+      {
+        "level": 2,
+        "title": "Community Energy Balance and Performance Accounting",
+        "line": 354,
+        "label": "sec:community_energy_balance_validation"
+      },
+      {
+        "level": 3,
+        "title": "Complete Energy Balance",
+        "line": 357,
+        "label": "subsec:complete_energy_balance"
+      },
+      {
+        "level": 3,
+        "title": "Performance Accounting",
+        "line": 367,
+        "label": "subsec:annual_accounting"
+      },
+      {
+        "level": 2,
+        "title": "Spanish Settlement and Billing Model",
+        "line": 399,
+        "label": "sec:spanish_settlement_billing_model"
+      },
+      {
+        "level": 3,
+        "title": "PVPC Import Price and Billing Boundary",
+        "line": 404,
+        "label": "subsec:pvpc_import_billing_boundary"
+      },
+      {
+        "level": 3,
+        "title": "PVPC Excedentaria Export Credit",
+        "line": 411,
+        "label": "subsec:pvpc_excedentaria_export_credit"
+      },
+      {
+        "level": 3,
+        "title": "Member-Level Monthly Compensation Cap",
+        "line": 416,
+        "label": "subsec:member_level_monthly_compensation_cap"
+      },
+      {
+        "level": 3,
+        "title": "Forfeited Compensation and Cap-Binding Events",
+        "line": 453,
+        "label": "subsec:forfeited_compensation_cap_binding"
+      },
+      {
+        "level": 3,
+        "title": "Bill Savings and Battery-Specific Bill Savings",
+        "line": 477,
+        "label": "subsec:bill_savings_battery_specific"
+      },
+      {
+        "level": 2,
+        "title": "Economic and Allocation Formulation",
+        "line": 496,
+        "label": "sec:economic-framework"
+      },
+      {
+        "level": 3,
+        "title": "Economic Evaluation Metrics",
+        "line": 503,
+        "label": "sec:ch5_economic_metrics"
+      },
+      {
+        "level": 3,
+        "title": "Bill Savings Calculation",
+        "line": 524,
+        "label": "sec:ch5_bill_savings"
+      },
+      {
+        "level": 3,
+        "title": "Capital and Operating Cost Model",
+        "line": 586,
+        "label": "sec:ch5_cost_model"
+      },
+      {
+        "level": 3,
+        "title": "Net Present Value and Payback",
+        "line": 624,
+        "label": "sec:ch5_npv_payback"
+      },
+      {
+        "level": 3,
+        "title": "Battery-Specific Value and Compensation-Cap Effects",
+        "line": 668,
+        "label": "sec:ch5_battery_value"
+      },
+      {
+        "level": 3,
+        "title": "Static Allocation Coefficients",
+        "line": 757,
+        "label": "sec:ch5_static_allocation"
+      },
+      {
+        "level": 3,
+        "title": "Member-Level Benefit Allocation",
+        "line": 789,
+        "label": "sec:ch5_member_benefit_allocation"
+      },
+      {
+        "level": 2,
+        "title": "Model Assumptions and Boundary Conditions",
+        "line": 843,
+        "label": "sec:model_assumptions_boundary_conditions"
+      }
+    ]
+  },
+  {
+    "chapter_number": 4,
+    "chapter_title": "Methodology",
+    "canonical_file": "canonical_tex/04_methodology.tex",
+    "sections": [
+      {
+        "level": 2,
+        "title": "Methodological Process",
+        "line": 11,
+        "label": "sec:overall_methodological_process"
+      },
+      {
+        "level": 2,
+        "title": "Case Study Definition: Seville Energy Community",
+        "line": 75,
+        "label": "sec:case_study_seville_energy_community"
+      },
+      {
+        "level": 2,
+        "title": "Community Composition and Load Profiles",
+        "line": 86,
+        "label": "sec:community_composition_load_profiles"
+      },
+      {
+        "level": 2,
+        "title": "PV Generation and Weather Data",
+        "line": 114,
+        "label": "sec:pv_generation_weather_data"
+      },
+      {
+        "level": 2,
+        "title": "Electricity Price and Tariff Data",
+        "line": 153,
+        "label": "sec:electricity_price_tariff_data"
+      },
+      {
+        "level": 2,
+        "title": "Technology, Dispatch, and Economic Parameters",
+        "line": 166,
+        "label": "sec:technology_economic_parameters"
+      },
+      {
+        "level": 2,
+        "title": "Battery Dispatch Implementation",
+        "line": 220,
+        "label": "sec:battery_dispatch_implementation"
+      },
+      {
+        "level": 3,
+        "title": "Dispatch Pseudocode",
+        "line": 223,
+        "label": "subsec:dispatch_pseudocode"
+      },
+      {
+        "level": 3,
+        "title": "Rationale and Limitations",
+        "line": 262,
+        "label": "subsec:dispatch_rationale_limitations"
+      },
+      {
+        "level": 2,
+        "title": "Data Processing Architecture",
+        "line": 267,
+        "label": "sec:data_processing_architecture"
+      },
+      {
+        "level": 2,
+        "title": "Data Quality, Assumptions, and Limitations",
+        "line": 297,
+        "label": "sec:data_quality_assumptions_limitations"
+      },
+      {
+        "level": 2,
+        "title": "Experimental Design and Sensitivity Analysis",
+        "line": 316,
+        "label": "sec:experimental"
+      },
+      {
+        "level": 3,
+        "title": "Scenario Design",
+        "line": 321,
+        "label": "subsec:scenario_design"
+      },
+      {
+        "level": 3,
+        "title": "PV Penetration Scenarios",
+        "line": 324,
+        "label": "subsec:pv_penetration_scenarios"
+      },
+      {
+        "level": 3,
+        "title": "Battery CAPEX Scenarios",
+        "line": 327,
+        "label": "subsec:battery_capex_scenarios"
+      },
+      {
+        "level": 3,
+        "title": "Electricity Price Sensitivity",
+        "line": 330,
+        "label": "subsec:electricity_price_sensitivity"
+      },
+      {
+        "level": 3,
+        "title": "Community Size and Composition Sensitivity",
+        "line": 333,
+        "label": "subsec:community_size_composition_sensitivity"
+      },
+      {
+        "level": 3,
+        "title": "Compensation Cap Assessment",
+        "line": 336,
+        "label": "subsec:compensation_cap_assessment"
+      },
+      {
+        "level": 2,
+        "title": "Validation and Robustness Assessment",
+        "line": 339,
+        "label": "subsec:validation_robustness_assessment"
+      },
+      {
+        "level": 3,
+        "title": "Validation Checks",
+        "line": 342,
+        "label": "subsec:validation_checks"
+      }
+    ]
+  }
+]

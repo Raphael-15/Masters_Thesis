@@ -1,0 +1,896 @@
+CHAPTER 3: Mathematical Formulation for Energy Communities
+DERIVED SEARCH COPY — CANONICAL SOURCE: ../canonical_tex/03_mathematical_formulation.tex
+
+
+
+
+
+
+
+Modelling Framework
+sec:modelling_framework
+
+Overall Approach
+subsec:overall_approach
+
+A deterministic time-series simulation model is used. All inputs-household demand, PV generation, electricity prices, allocation coefficients, and technical parameters-are specified as aligned time series or fixed parameters. No stochastic process, probabilistic forecast, or optimisation solver is required in the baseline framework. This choice supports transparent, reproducible, and auditable evaluation of battery value under explicitly defined operating and settlement rules.
+
+The model is formulated for a general simulation horizon  and participant set . An hourly implementation is used in this thesis; for a complete non-leap calendar year, . Other locations, community sizes, and aligned time horizons can be represented without changing the energy-flow equations. Three configurations are simulated under identical inputs:
+
+enumerate
+    No-DER baseline: no shared PV and no battery; all household demand is served from the grid.
+    PV-only scenario: shared community PV is introduced; surplus allocated PV is exported to the grid.
+    PV-BESS scenario: shared community PV is combined with a centralised community battery; allocated PV surplus charges the battery before export.
+enumerate
+
+Battery-specific value is defined as the incremental difference between the PV-BESS result and the PV-only result under the same load profiles, PV generation, price series, tariff rules, and allocation coefficients:
+
+equation
+eq:delta_x_bess
+X_BESS = X_PV-BESS - X_PV-only,
+equation
+
+where  may represent annual bill savings, NPV, self-consumption ratio, self-sufficiency ratio, or another defined performance indicator. This reference-case comparison links the measured difference directly to the battery rather than to the PV system or to changes in the assumed inputs.
+
+Regulatory and Settlement Boundary
+subsec:regulatory_settlement_boundary
+
+The physical energy-flow and allocation layers are general and can be reused under different regulatory settings. The settlement layer is modular: import valuation, export valuation, billing-period length, compensation limits, and carry-over rules can be replaced without changing the preceding hourly energy-flow equations.
+
+For the Spanish application developed in this thesis, collective self-consumption is represented under Real Decreto 244/2019boe2019real. Shared generation is assigned through participant-level allocation coefficients, and the simplified-compensation mechanism is applied monthly. Export compensation cannot exceed the value of imported energy within the same billing period, and unused compensation is not carried forward. The case-specific regulatory boundary and Seville assumptions are documented in Section sec:case-study.
+
+Static allocation coefficients are used in the baseline framework. These coefficients remain fixed over the simulation horizon and are applied to shared PV generation and to the attribution of battery-related flows. Dynamic allocation can be incorporated in another application by replacing the coefficient time series while retaining the same member-level accounting structure.
+
+No-DER Baseline Scenario
+sec:no_der_baseline_ch4
+
+The No-DER baseline represents the reference case with no shared PV system and no battery in the community. This indicates that every household demand is supplied by the grid. This scenario creates the reference electricity bill against which PV-only and PV-BESS savings are measured.
+
+Energy Balance
+subsec:no_der_energy_balance
+
+equation
+eq:aggregate_load
+L_t = _i=1^N L_i,t,
+equation
+
+equation
+eq:no_der_import_member
+I^0_i,t = L_i,t,
+equation
+
+equation
+eq:no_der_export_self_consumption
+E^0_i,t = 0, SC^0_i,t = 0,
+equation
+
+equation
+eq:no_der_import_total
+I^0_t = _i=1^N I^0_i,t = L_t.
+equation
+
+Billing
+subsec:no_der_billing
+
+equation
+eq:no_der_monthly_cost
+C^0_i,m = _t m I^0_i,t p^imp_t,
+equation
+
+equation
+eq:no_der_annual_bill_member
+B^0_i = _m=1^12 C^0_i,m,
+equation
+
+equation
+eq:no_der_annual_bill_community
+B^0_community = _i=1^N B^0_i.
+equation
+
+Since there is no export in the No-DER case, no export compensation or monthly compensation cap is applied. For calculating absolute and percentage savings in the PV-only and PV-BESS scenarios, the annual No-DER bill is considered the reference.
+
+PV-Only Scenario
+sec:pv_only_scenario_ch4
+
+In this scenario, there is the introduction of a shared community PV system but no battery. PV generation is allocated to members using static coefficients. Here, each member first uses its allocated generated energy to offset its own hourly demand; energy demand is imported from the grid if there is residual demand left, and excess energy from allocated PV is exported.
+
+Static Member-Level Allocation
+subsec:static_member_allocation_pv_only
+
+equation
+eq:beta_condition
+_i 0, _i=1^N _i = 1,
+equation
+
+equation
+eq:allocated_pv
+G^alloc_i,t = _i G_t.
+equation
+
+In the baseline, the static coefficients are proportional to annual household demand:
+
+equation
+eq:beta_annual_demand
+_i = _t L_i,t_i _t L_i,t.
+equation
+
+This proportional rule provides larger shares of shared PV to members with greater annual demand, while preserving a transparent and reusable allocation mechanism.
+
+Member-Level Energy Flows
+subsec:member_level_energy_flows_pv_only
+
+equation
+eq:pv_self_consumption_member
+SC^PV_i,t = (L_i,t, G^alloc_i,t),
+equation
+
+equation
+eq:pv_import_member
+I^PV_i,t = (L_i,t - G^alloc_i,t, 0),
+equation
+
+equation
+eq:pv_export_member
+E^PV_i,t = (G^alloc_i,t - L_i,t, 0),
+equation
+
+equation
+eq:pv_aggregated_flows
+SC^PV_t = _i SC^PV_i,t, I^PV_t = _i I^PV_i,t, E^PV_t = _i E^PV_i,t.
+equation
+
+This member-level hourly calculation is preferred to community-level netting because offsetting imports and exports across participants can overestimate self-consumption. For example, one member may export excess allocated PV while another imports grid energy during the same hour. Static allocation therefore requires member-level flow calculation before aggregation.
+
+Energy Conservation and Performance Indicators
+subsec:energy_conservation_indicators_pv_only
+
+equation
+eq:pv_member_energy_conservation
+L_i,t + E^PV_i,t = G^alloc_i,t + I^PV_i,t,
+equation
+
+equation
+eq:pv_community_energy_conservation
+L_t + E^PV_t = G_t + I^PV_t,
+equation
+
+equation
+eq:scr_pv
+SCR^PV = _t SC^PV_t_t G_t,
+equation
+
+equation
+eq:ssr_pv
+SSR^PV = _t SC^PV_t_t L_t.
+equation
+
+The self-consumption ratio (SCR) measures the share of PV generation consumed locally, while the self-sufficiency ratio (SSR) measures the share of community demand served by local PV generation.
+
+PV-BESS Scenario
+sec:pv_bess_scenario_ch4
+
+In this scenario, a centralised community battery is added to the PV-only configuration. The battery is represented by its upper and lower state-of-charge limits, charge and discharge power limits, round-trip efficiency, and initial state of charge. These parameters are application inputs rather than fixed properties of the general methodology. The corresponding values for the Seville case study are defined in Section sec:technology_economic_parameters.
+
+Where equal one-way efficiencies are assumed, the round-trip efficiency  is represented consistently as
+
+equation
+eq:one_way_efficiency
+^ch=^dis=^rt.
+equation
+
+After member-level allocation, the battery charges only from surplus PV energy and discharges only to meet residual member demand. Grid charging is excluded, ensuring that the measured storage value reflects the shifting of community PV generation rather than a separate grid-arbitrage activity.
+
+Allocation-Consistent Community Flow Definitions
+subsec:allocation_consistent_flows
+
+Collective self-consumption is settled for each participant, and dispatch is based on the member-level flows obtained after implementing the static coefficients. Direct PV use, allocated surplus, and residual demand are defined as
+
+align
+D^PV_i,t &= (L_i,t,G^alloc_i,t),eq:direct_pv_member_bess
+
+U_i,t &= (G^alloc_i,t-L_i,t,0),eq:surplus_pv_member
+
+D_i,t &= (L_i,t-G^alloc_i,t,0).eq:deficit_pv_member
+align
+
+The community totals used by the battery controller are
+
+align
+U_t &= _i U_i,t,eq:allocated_surplus_total
+
+D_t &= _i D_i,t,eq:allocated_deficit_total
+
+D^PV_t &= _i D^PV_i,t.eq:direct_pv_total
+align
+
+This formulation avoids offsetting imports and exports across participants. Under static allocation, one member may export allocated PV surplus while another imports during the same hour; therefore, using only  would overstate direct community balancing.
+
+Community Energy Balance and State of Charge
+subsec:bess_community_energy_balance
+
+At the accounting boundary, the community energy balance is
+
+equation
+eq:bess_community_energy_balance
+G_t + I^BESS_t + P^dis_t
+=
+L_t + E^BESS_t + P^ch_t.
+equation
+
+Here,  is bus-side PV energy sent to the charger and  is bus-side energy delivered from the battery to participant demand. It is important to note that conversion losses are set only in the state-of-charge equation:
+
+equation
+eq:bess_soc_update
+S_t=S_t-1+^chP^ch_t-
+P^dis_t^dis.
+equation
+
+This convention ensures losses are not counted twice.
+
+Battery Operating Bounds
+subsec:battery_operating_bounds
+
+align
+S_ &S_t S_,eq:soc_bounds
+
+0 &P^ch_t P^ch,max,0 P^dis_t P^dis,max,eq:power_bounds
+
+P^ch_tP^dis_t &=0.eq:no_simultaneous_charge_discharge
+align
+
+For an application with charge and discharge C-rates  and , the corresponding power limits may be defined as
+
+align
+P^ch,max &= c^chS_,eq:charge_power_from_c_rate
+
+P^dis,max &= c^disS_.eq:discharge_power_from_c_rate
+align
+
+If the permitted depth of discharge is , the minimum state of charge is
+
+equation
+eq:soc_min_from_dod
+S_=(1-d^DoD)S_.
+equation
+
+The initial state of charge is specified as a fraction  of the upper limit:
+
+equation
+eq:initial_soc
+S_0=s_0S_, 0s_01.
+equation
+
+The case-specific C-rates, depth of discharge, initial state-of-charge fraction, and battery capacity are defined in Section sec:technology_economic_parameters. For annual comparisons, the model also reports the difference in terminal SOC, . A sensitivity check may impose  to prevent artificial benefit from ending the simulation at a lower SOC.
+
+Charging, Discharging, Import, and Export
+subsec:community_surplus_import_export_self_consumption
+
+The battery charges from allocated PV surplus subject to available headroom:
+
+equation
+eq:charging_logic
+P^ch_t=
+(U_t,P^ch,max,
+S_-S_t-1^ch).
+equation
+
+After charging,
+
+equation
+eq:s_after_ch
+S^afterch_t=S_t-1+^chP^ch_t.
+equation
+
+Discharge is allowed when residual demand is still present, and the OMIE signal is at or above the attributed threshold:
+
+equation
+eq:discharging_condition
+D_t>0 and p^W_tp^threshold.
+equation
+
+When this condition holds,
+
+equation
+eq:discharging_logic
+P^dis_t=
+(D_t,P^dis,max,
+^dis(S^afterch_t-S_)),
+equation
+
+and otherwise . The end-of-hour SOC is
+
+equation
+eq:soc_after_discharge
+S_t=S^afterch_t-
+P^dis_t^dis.
+equation
+
+Community import and export are then
+
+align
+I^BESS_t &= D_t-P^dis_t,eq:bess_import
+
+E^BESS_t &= U_t-P^ch_t.eq:bess_export
+align
+
+The dispatch limits show  and  ensuring that both expressions are non-negative.
+
+Member-Level Allocation of Battery Flows
+subsec:member_level_allocation_bess_flows
+
+Battery charging is proportionally attributed to members allocated to PV surplus that creates the charging opportunity:
+
+equation
+eq:allocated_battery_charge
+P^ch,alloc_i,t=
+cases
+P^ch_tU_i,tU_t, & U_t>0,
+
+0, & U_t=0.
+cases
+equation
+
+Battery discharge is attributed to members in proportion to residual demand:
+
+equation
+eq:allocated_battery_discharge_positive
+P^dis,alloc_i,t=
+cases
+P^dis_tD_i,tD_t, & D_t>0,
+
+0, & D_t=0.
+cases
+equation
+
+The resulting member-level import and export are
+
+align
+I^BESS_i,t &= D_i,t-P^dis,alloc_i,t,eq:bess_import_member
+
+E^BESS_i,t &= U_i,t-P^ch,alloc_i,t.eq:bess_export_member
+align
+
+These definitions satisfy
+
+equation
+eq:member_flow_closure
+_i I^BESS_i,t=I^BESS_t,
+_i E^BESS_i,t=E^BESS_t.
+equation
+
+Battery Dispatch Logic
+sec:battery_dispatch_logic
+
+The controller is a transparent set of predefined operating rules rather than an optimisation model. A selected wholesale-price series may be used to rank hours for discharge, but it is kept separate from the retail prices used for billing. In the Spanish application, the OMIE day-ahead series provides this dispatch signal and does not directly value PVPC imports or exportsomie2025omie. The discharge threshold is defined as a configurable percentile of the annual price distribution; the selected percentile for the Seville application is reported in Section sec:technology_economic_parameters.
+
+Community Energy Balance and Performance Accounting
+sec:community_energy_balance_validation
+
+Complete Energy Balance
+subsec:complete_energy_balance
+
+Equation eq:bess_community_energy_balance reduces to the PV-only and No-DER balances as follows:
+
+align
+PV-only:G_t+I^PV_t &= L_t+E^PV_t,eq:pv_only_balance_reduction
+
+No-DER:I^0_t &= L_t.eq:no_der_balance_reduction
+align
+
+Performance Accounting
+subsec:annual_accounting
+
+To avoid ambiguity, two complementary local-use indicators are reported. The self-consumption ratio measures the share of PV generation used directly or sent to the battery:
+
+equation
+eq:scr_general
+SCR=_t(D^PV_t+P^ch_t)_t G_t
+=1-_t E_t_tG_t.
+equation
+
+The self-sufficiency ratio measures the share of demand served directly by PV or by battery discharge:
+
+equation
+eq:ssr_general
+SSR=_t(D^PV_t+P^dis_t)_t L_t.
+equation
+
+Battery losses are therefore reflected in the difference between PV energy charged and useful discharge delivered. The annual battery throughput and equivalent full cycles are
+
+align
+E^dis_annual &= _tP^dis_t,eq:annual_discharge
+
+N_EFC &= E^dis_annualS_-S_.eq:equivalent_full_cycles
+align
+
+The incremental technical contribution of storage is reported as
+
+align
+SCR_BESS &= SCR_PV-BESS-SCR_PV-only,eq:delta_scr_bess
+
+SSR_BESS &= SSR_PV-BESS-SSR_PV-only.eq:delta_ssr_bess
+align
+
+Spanish Settlement and Billing Model
+sec:spanish_settlement_billing_model
+
+This section converts hourly member-level energy flows into monthly and annual bills under the Spanish PVPC tariff and the RD 244/2019 simplified compensation mechanism. OMIE is used only as a battery dispatch signalomie2025omie; it is not used to value PVPC baseline imports or exports.
+
+PVPC Import Price and Billing Boundary
+subsec:pvpc_import_billing_boundary
+
+The baseline billing boundary includes only variable energy cashflows. Grid imports are valued using the selected hourly PVPC variable energy-price series, . Fixed power charges, meter rental, VAT, electricity tax, and other non-energy items are excluded because they are not altered by hourly PV or battery operation. The compensation cap is therefore applied against the same modelled monthly import-energy cost used in the scenario comparison.
+
+This boundary does not represent a complete retail invoice. Any later extension that adds fixed charges or taxes must report them separately and must not imply that they are avoided by self-consumption.
+
+PVPC Excedentaria Export Credit
+subsec:pvpc_excedentaria_export_credit
+
+Surplus exports are valued using the PVPC excedentaria export-credit price, , published by REE/ESIOSreendprecio. This export credit is generally lower than the import price because it does not include the full retail components avoided through self-consumption. Therefore, direct self-consumption and battery-enabled surplus shifting are typically more valuable than exporting surplus energy.
+
+Member-Level Monthly Compensation Cap
+subsec:member_level_monthly_compensation_cap
+
+For each household  and month , the model calculates import cost, raw export compensation, applied export compensation, and net monthly energy bill as follows:
+
+equation
+eq:monthly_import_cost
+C^imp_i,m = _t m I_i,tp^imp_t,
+equation
+
+equation
+eq:raw_export_compensation
+R^raw_i,m = _t m E_i,tp^exp_t,
+equation
+
+equation
+eq:applied_export_compensation
+R^applied_i,m = (R^raw_i,m, C^imp_i,m),
+equation
+
+equation
+eq:net_monthly_energy_bill
+B_i,m = C^imp_i,m - R^applied_i,m,
+equation
+
+equation
+eq:community_monthly_bill
+B^community_m = _i B_i,m,
+equation
+
+equation
+eq:annual_bill
+B^annual = _m=1^12 B^community_m.
+equation
+
+The cap is applied at member level because each participant has an individual billing relationship. A member with high export credit and low import cost cannot transfer unused compensation to another member. This prevents hidden cross-subsidization and makes the member-level benefit analysis consistent with the settlement boundary.
+
+Forfeited Compensation and Cap-Binding Events
+subsec:forfeited_compensation_cap_binding
+
+equation
+eq:lost_compensation
+Lost_i,m = R^raw_i,m - R^applied_i,m,
+equation
+
+equation
+eq:cap_binding
+CapBind_i,m =
+cases
+1, & R^raw_i,m > C^imp_i,m, 
+
+0, & otherwise,
+cases
+equation
+
+equation
+eq:annual_lost_compensation
+Lost_annual = _i _m Lost_i,m.
+equation
+
+These quantities identify months and members for which the simplified compensation cap binds. They are important for RQ2 because one battery-specific value mechanism is the reduction of forfeited export compensation: surplus PV that would otherwise be exported and partly forfeited can instead be stored and used later to avoid imports.
+
+Bill Savings and Battery-Specific Bill Savings
+subsec:bill_savings_battery_specific
+
+equation
+eq:scenario_saving
+Saving_scenario = B^No-DER - B^scenario,
+equation
+
+equation
+eq:scenario_saving_pct
+SavingPct_scenario = Saving_scenarioB^No-DER,
+equation
+
+equation
+eq:bess_specific_saving
+Saving_BESS-specific = B^PV-only - B^PV-BESS.
+equation
+
+Equation eq:bess_specific_saving is the core bill-based measure of battery-specific value. Economic metrics such as NPV and payback period are developed in Section sec:economic-framework using these annual savings and the investment-cost assumptions.
+Economic and Allocation Formulation
+sec:economic-framework
+
+This chapter converts the participant-level monthly settlement outputs developed in Section sec:spanish_settlement_billing_model into project-level and member-level economic indicators. The hourly energy-flow model is not recalculated here. Instead, the annual bills obtained for the No-DER, PV-only, and PV-BESS configurations are combined with the technology-cost assumptions defined in Section sec:technology_economic_parameters.
+
+All scenarios retain identical demand, PV generation, price series, tariff rules, allocation coefficients, and evaluation periods. Consequently, differences between the PV-BESS and PV-only configurations can be attributed to the addition of battery storage rather than to changes in the underlying assumptions. The billing boundary remains limited to variable energy cashflows: fixed power charges, meter rental, taxes, and other invoice components excluded in Section subsec:pvpc_import_billing_boundary are not treated as avoidable savings in this chapter.
+
+Economic Evaluation Metrics
+sec:ch5_economic_metrics
+
+The economic assessment uses the following indicators.
+
+Annual bill savings. Annual bill savings measure the reduction in the modelled variable-energy bill relative to the No-DER baseline. Savings are calculated both for the community and for each participant.
+
+Net Present Value. Net Present Value (NPV) measures the present value of bill savings net of capital and operating costs over the 15-year project horizon. A positive NPV indicates that discounted benefits exceed discounted costs within the defined assessment boundary.
+
+Simple payback period. The simple payback period is the first year in which cumulative undiscounted net savings recover the initial investment.
+
+Discounted payback period. The discounted payback period is the first year in which cumulative discounted net savings recover the initial investment.
+
+Benefit-Cost Ratio. The Benefit-Cost Ratio (BCR) compares the present value of bill savings with the present value of capital and operating costs. A value greater than one indicates that discounted benefits exceed discounted costs.
+
+Battery-specific value. Battery-specific value is evaluated by comparing PV-BESS directly with PV-only under identical inputs. The principal indicators are battery-specific annual bill savings, incremental NPV, and battery-specific payback.
+
+The Self-Consumption Ratio and Self-Sufficiency Ratio are retained as technical performance indicators and are calculated using Equations eq:scr_general and eq:ssr_general. They are not treated as monetary benefits unless their effect is already reflected in the participant-level import and export bills.
+
+Levelized Cost of Energy is not used as the primary viability indicator because this thesis evaluates avoided electricity expenditure and participant-level settlement for a combined PV-BESS system rather than the cost of electricity produced by a single generation technology.
+
+Bill Savings Calculation
+sec:ch5_bill_savings
+
+Let  denote a project configuration. The annual bill of participant  under configuration  is obtained by summing the monthly bills defined in Equation eq:net_monthly_energy_bill:
+
+equation
+B_i^s=_m=1^12B_i,m^s.
+eq:ch5_member_annual_bill
+equation
+
+The corresponding annual community bill is
+
+equation
+B^s=_i=1^NB_i^s.
+eq:ch5_community_annual_bill
+equation
+
+The participant-level annual bill saving relative to No-DER is
+
+equation
+BS_i^s=B_i^0-B_i^s,
+eq:ch5_member_bill_saving
+equation
+
+and the community-level annual bill saving is
+
+equation
+BS^s=_i=1^NBS_i^s=B^0-B^s.
+eq:ch5_community_bill_saving
+equation
+
+These quantities are consistent with the community-level saving already defined in Equation eq:scenario_saving. Because the monthly compensation cap is applied before annual aggregation,  already incorporates participant-level import cost, raw export compensation, applied export compensation, and forfeited compensation.
+
+The battery-specific annual bill saving of participant  is
+
+equation
+BS_i^BESS=B_i^PV-B_i^PV-BESS,
+eq:ch5_member_bess_bill_saving
+equation
+
+while the community-level battery-specific annual bill saving is
+
+equation
+BS^BESS=_i=1^NBS_i^BESS
+=B^PV-B^PV-BESS.
+eq:ch5_community_bess_bill_saving
+equation
+
+Equation eq:ch5_community_bess_bill_saving is equivalent to Equation eq:bess_specific_saving. A positive value indicates that the battery reduces the modelled annual community bill relative to PV-only.
+
+The baseline economic analysis is expressed in real terms. The representative-year bill savings are therefore repeated over the 15-year project horizon without an automatic escalation factor:
+
+equation
+BS_i,y^s=BS_i^s,
+BS_y^s=BS^s,
+y=1,,H.
+eq:ch5_repeated_real_bill_savings
+equation
+
+Electricity-price sensitivities are implemented by recalculating the underlying bills under the price scenarios defined in Section sec:experimental, rather than by applying an unverified annual escalation rate after settlement.
+
+Capital and Operating Cost Model
+sec:ch5_cost_model
+
+Let  denote installed PV capacity in kWp and  denote nominal battery energy capacity in kWh. Let  and  denote the corresponding installed unit costs in EUR/kWp and EUR/kWh. The initial investment for the PV-only configuration is
+
+equation
+C_0^PV=c_PVP_PV,
+eq:ch5_pv_capex
+equation
+
+and the initial investment for the PV-BESS configuration is
+
+equation
+C_0^PV-BESS
+=c_PVP_PV+c_BESSE_BESS.
+eq:ch5_pv_bess_capex
+equation
+
+The installed unit-cost assumptions are treated as inclusive project-cost inputs. Separate module, inverter, balance-of-system, installation, and development costs are not added again unless they are explicitly separated in the scenario register, thereby avoiding double counting.
+
+The annual PV operation and maintenance cost is
+
+equation
+O_y^PV=o_PVP_PV,
+eq:ch5_pv_opex
+equation
+
+where  is the annual PV OM cost in EUR/kWp/year. Under the baseline assumptions currently defined in Section sec:technology_economic_parameters, no separate BESS OM parameter is added. Therefore,
+
+equation
+O_y^PV-BESS=O_y^PV.
+eq:ch5_pv_bess_opex
+equation
+
+If a separate BESS OM assumption is introduced in the scenario register, it must be added explicitly and applied consistently to every PV-BESS scenario.
+
+Consistent with the scope of the thesis, the baseline cost model does not include PV or battery degradation, battery replacement scheduling, inverter replacement, financing costs, or terminal residual value. These items must not be introduced in selected scenarios without also updating the common assessment boundary.
+
+Net Present Value and Payback
+sec:ch5_npv_payback
+
+Let  years denote the project horizon and let  denote the real discount rate defined in Section sec:technology_economic_parameters. The annual net cash benefit of configuration  in year  is
+
+equation
+CF_y^s=BS_y^s-O_y^s.
+eq:ch5_scenario_cash_flow
+equation
+
+The project-level NPV of configuration  relative to No-DER is
+
+equation
+NPV^s=-C_0^s+_y=1^HCF_y^s(1+r)^y.
+eq:ch5_project_npv
+equation
+
+The simple payback period is the smallest year  satisfying
+
+equation
+_y=1^nCF_y^sC_0^s.
+eq:ch5_simple_payback
+equation
+
+The discounted payback period is the smallest year  satisfying
+
+equation
+_y=1^nCF_y^s(1+r)^yC_0^s.
+eq:ch5_discounted_payback
+equation
+
+Where the relevant threshold is not reached within 15 years, payback is reported as not achieved within the project horizon rather than extrapolated beyond the assessment boundary.
+
+The project-level BCR is
+
+equation
+BCR^s=
+_y=1^HBS_y^s(1+r)^y
+C_0^s+_y=1^HO_y^s(1+r)^y.
+eq:ch5_project_bcr
+equation
+
+A BCR greater than one and a positive NPV provide equivalent accept/reject signals under the same cash-flow boundary, although they communicate profitability in different forms.
+
+Battery-Specific Value and Compensation-Cap Effects
+sec:ch5_battery_value
+
+The incremental capital cost attributable to the battery is
+
+equation
+C_0^BESS
+=C_0^PV-BESS-C_0^PV
+=c_BESSE_BESS.
+eq:ch5_incremental_bess_capex
+equation
+
+The incremental annual operating cost is
+
+equation
+O_y^BESS
+=O_y^PV-BESS-O_y^PV.
+eq:ch5_incremental_bess_opex
+equation
+
+Under the baseline cost assumptions, . The battery-specific incremental NPV is
+
+align
+NPV^BESS
+&=NPV^PV-BESS-NPV^PV 
+
+&=-C_0^BESS
++_y=1^H
+BS_y^BESS-O_y^BESS(1+r)^y.
+eq:ch5_incremental_bess_npv
+align
+
+A positive  indicates that the additional discounted bill savings created by storage exceed the incremental battery cost within the 15-year horizon.
+
+Battery-specific payback is calculated against the incremental battery investment. The simple battery payback is the smallest  satisfying
+
+equation
+_y=1^n
+(BS_y^BESS-O_y^BESS)
+C_0^BESS,
+eq:ch5_bess_simple_payback
+equation
+
+and the discounted battery payback is the smallest  satisfying
+
+equation
+_y=1^n
+BS_y^BESS-O_y^BESS(1+r)^y
+C_0^BESS.
+eq:ch5_bess_discounted_payback
+equation
+
+The annual bill effect of the battery can be decomposed without double counting. The avoided import-cost component is
+
+equation
+V_y^imp=
+_i=1^N_m=1^12
+(C_i,m^imp,PV-C_i,m^imp,PV-BESS),
+eq:ch5_avoided_import_value
+equation
+
+and the change in applied export compensation is
+
+equation
+R_y^applied=
+_i=1^N_m=1^12
+(R_i,m^applied,PV-BESS
+-R_i,m^applied,PV).
+eq:ch5_change_applied_export_credit
+equation
+
+The exact accounting identity is
+
+equation
+BS_y^BESS=V_y^imp+R_y^applied.
+eq:ch5_bess_bill_identity
+equation
+
+Battery charging generally reduces exports and therefore may reduce applied export compensation, while battery discharge reduces grid-import cost. Equation eq:ch5_bess_bill_identity captures both effects once and prevents the same shifted kilowatt-hour from being counted separately as time-shifting value, export-displacement value, and self-consumption value.
+
+The change in forfeited compensation is reported as a diagnostic indicator:
+
+equation
+Lost_y^BESS=
+Lost_y^PV-Lost_y^PV-BESS.
+eq:ch5_reduction_forfeited_compensation
+equation
+
+This quantity helps explain the effect of the monthly cap, but it is not added to Equation eq:ch5_bess_bill_identity, because its financial effect is already contained in the applied export compensation and final bills.
+
+Static Allocation Coefficients
+sec:ch5_static_allocation
+
+This chapter does not introduce a second energy-allocation rule. The same static coefficients  used in the hourly model are retained throughout the economic assessment. They are non-negative, sum to one, and are proportional to annual household demand as defined in Equations eq:beta_condition and eq:beta_annual_demand.
+
+Shared PV generation is allocated before participant-level self-consumption, imports, exports, battery charging, battery discharge, and monthly compensation are calculated. Therefore, economic benefits are derived from the participant-level bills produced by the settlement model; they are not obtained by dividing an aggregate community bill after settlement.
+
+For the baseline ownership and cost-sharing arrangement, each participant's share of scenario capital cost is
+
+equation
+C_0,i^s=_i C_0^s,
+eq:ch5_member_capex_share
+equation
+
+and the participant's share of annual operating cost is
+
+equation
+O_i,y^s=_i O_y^s.
+eq:ch5_member_opex_share
+equation
+
+These allocations satisfy
+
+equation
+_i=1^NC_0,i^s=C_0^s,
+_i=1^NO_i,y^s=O_y^s.
+eq:ch5_cost_allocation_closure
+equation
+
+Alternative ownership or cost-sharing coefficients may be tested as a governance sensitivity, but they must be identified separately from the physical energy-allocation coefficients and must preserve cost-allocation closure.
+
+Member-Level Benefit Allocation
+sec:ch5_member_benefit_allocation
+
+Because imports, exports, and compensation are calculated separately for each participant, member-level gross economic benefits are obtained directly from Equation eq:ch5_member_bill_saving. The annual net cash benefit of participant  under configuration  is
+
+equation
+CF_i,y^s=BS_i,y^s-O_i,y^s.
+eq:ch5_member_cash_flow
+equation
+
+The member-level NPV is
+
+equation
+NPV_i^s=-C_0,i^s
++_y=1^HCF_i,y^s(1+r)^y.
+eq:ch5_member_npv
+equation
+
+The allocation framework is internally consistent because
+
+equation
+_i=1^NNPV_i^s=NPV^s.
+eq:ch5_member_npv_closure
+equation
+
+The participant-level battery-specific NPV is
+
+equation
+NPV_i^BESS
+=NPV_i^PV-BESS-NPV_i^PV,
+eq:ch5_member_incremental_bess_npv
+equation
+
+with
+
+equation
+_i=1^NNPV_i^BESS
+=NPV^BESS.
+eq:ch5_member_incremental_npv_closure
+equation
+
+A member-level BCR is calculated as
+
+equation
+BCR_i^s=
+_y=1^HBS_i,y^s(1+r)^y
+C_0,i^s+_y=1^HO_i,y^s(1+r)^y.
+eq:ch5_member_bcr
+equation
+
+Member-level NPV, BCR, annual bill savings, and battery-specific bill savings are reported in Section sec:results. These results reveal whether a configuration that is viable at community level also produces acceptable outcomes for individual participants.
+
+This section establishes a consistent economic bridge between the participant-level settlement model and the scenario analysis. Section sec:experimental applies these definitions across the selected PV penetration, battery CAPEX, electricity price, community size, and community composition cases, while Section sec:results reports the resulting project-level and member-level outcomes.
+
+Model Assumptions and Boundary Conditions
+sec:model_assumptions_boundary_conditions
+
+The general model boundaries are stated explicitly so that the framework can be replicated without over-generalising the resulting conclusions. Numerical values are not fixed in this chapter; the Seville values are provided in Section sec:case-study, while the economic calculations are developed in Section sec:economic-framework.
+
+longtablep0.30p0.60
+General methodological assumptions and configurable elements.tab:general_methodological_boundaries
+
+Element & General treatment 
+
+Element & General treatment 
+
+System boundary & Grid-connected collective self-consumption with shared PV and an optional central community battery. 
+
+Temporal resolution & A common time step is required for load, PV, prices, allocation, and dispatch. The thesis uses hourly resolution, but the equations remain applicable to another consistent resolution. 
+
+Scenario consistency & No-DER, PV-only, and PV-BESS are evaluated using identical demand, PV, prices, tariff rules, allocation coefficients, and evaluation periods. 
+
+Allocation & Static non-negative coefficients summing to one are used in the baseline. Alternative static or dynamic rules can replace them if participant-level closure is maintained. 
+
+Battery charging source & The battery charges from allocated PV surplus only; grid charging is excluded from the baseline. 
+
+Battery representation & State of charge, power limits, efficiency, depth of discharge, and initial and terminal conditions are explicit input parameters. Detailed electrochemical degradation is outside the baseline. 
+
+Dispatch & Rule-based operation is used. A configurable price threshold may rank discharge hours, but the dispatch-price signal is separated from retail billing prices. 
+
+Settlement & Imports and exports are calculated for each participant before monthly settlement. The Spanish application implements the RD 244/2019 simplified-compensation cap and no carry-over. 
+
+Economic boundary & The hourly model passes annual bill and energy outputs to the economic framework. CAPEX, OPEX, project horizon, and discount rate are configurable application inputs. 
+
+Network representation & Voltage, thermal, transformer, protection, and power-quality constraints are not modelled. 
+
+Validation & Hourly energy balance, state-of-charge limits, non-negativity, member-level flow closure, allocation closure, monthly compensation limits, and scenario consistency are checked. 
+
+longtable
+
+The framework provides separation between the reusable computational method and the application-specific inputs. It is possible to reproduce another collective self-consumption case by replacing the input datasets and parameter register, selecting the relevant settlement module, and re-running the same sequence of hourly, monthly, and annual calculations.
+
+This section has established the mathematical and computational framework used to compare No-DER, PV-only, and PV-BESS scenarios and to extract the incremental contribution/value of battery storage. Section sec:case-study now applies this framework to the specific case of the Seville community and defines the datasets, participant composition, technology parameters, and data architecture implemented in this research.

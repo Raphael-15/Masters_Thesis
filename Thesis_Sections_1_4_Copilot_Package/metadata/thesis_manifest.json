@@ -1,0 +1,66 @@
+{
+  "package_name": "Thesis Sections 1–4 — GitHub Copilot / LLM Context Package",
+  "title": "Techno-Economic Assessment of Shared PV and Battery Energy Storage Systems under Spanish Residential Collective Self-Consumption",
+  "subtitle": "A Simulation-Based Case Study in Seville, Spain",
+  "author": "Raphael Omonzokpia Demilade",
+  "purpose": "Machine-readable context for GitHub Copilot and other LLM coding assistants. The canonical LaTeX source is preserved without content replacement.",
+  "canonical_source_format": "LaTeX",
+  "derived_formats": [
+    "Markdown wrappers containing exact LaTeX",
+    "plain-text search copies"
+  ],
+  "read_order": [
+    "llm_markdown/00_COPILOT_CONTEXT.md",
+    "llm_markdown/01_introduction.md",
+    "llm_markdown/02_literature_review.md",
+    "llm_markdown/03_mathematical_formulation.md",
+    "llm_markdown/04_methodology.md",
+    "references.bib"
+  ],
+  "chapters": [
+    {
+      "number": 1,
+      "title": "Introduction",
+      "canonical_file": "canonical_tex/01_introduction.tex",
+      "llm_file": "llm_markdown/01_introduction.md"
+    },
+    {
+      "number": 2,
+      "title": "Literature Review and Research Gap",
+      "canonical_file": "canonical_tex/02_literature_review.tex",
+      "llm_file": "llm_markdown/02_literature_review.md"
+    },
+    {
+      "number": 3,
+      "title": "Mathematical Formulation for Energy Communities",
+      "canonical_file": "canonical_tex/03_mathematical_formulation.tex",
+      "llm_file": "llm_markdown/03_mathematical_formulation.md"
+    },
+    {
+      "number": 4,
+      "title": "Methodology",
+      "canonical_file": "canonical_tex/04_methodology.tex",
+      "llm_file": "llm_markdown/04_methodology.md"
+    }
+  ],
+  "research_questions": [
+    "RQ1: Under what conditions does a shared BESS provide incremental value over a PV-only configuration?",
+    "RQ2: How much value is attributable specifically to the battery, and how is it affected by the monthly compensation cap under RD 244/2019?",
+    "RQ3: How sensitive are the results to PV penetration, battery CAPEX, electricity prices, community size, and participant composition?"
+  ],
+  "core_scenarios": [
+    "No-DER",
+    "PV-only",
+    "PV–BESS"
+  ],
+  "regulatory_context": "Spanish residential collective self-consumption under RD 244/2019, with participant-level monthly simplified compensation and no carry-over.",
+  "case_study": {
+    "location": "Seville, Spain",
+    "baseline_households": 30,
+    "sensitivity_households": "10–50",
+    "battery": "Centralised 150 kWh LFP BESS",
+    "time_step": "Hourly",
+    "economic_horizon_years": 15
+  },
+  "content_integrity_note": "Do not treat derived Markdown or plain-text files as replacements for the canonical LaTeX. They are navigation/context aids only."
+}
