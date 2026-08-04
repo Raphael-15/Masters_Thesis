@@ -1,0 +1,53 @@
+# Baseline scenario register template
+
+# NOTE: All values marked "REQUIRED INPUT" must be supplied before running the baseline experiments.
+
+simulation:
+  year: 2025  # representative year (REQUIRED INPUT)
+  timezone: Europe/Madrid
+  timestep: 1h
+
+community:
+  # REQUIRED INPUT: path to member mapping file in data/raw/load or a single combined load file
+  members_file: "data/raw/load/community_members.csv"  # REQUIRED INPUT
+  # If members_file is not used, provide list of member CSVs in data/raw/load/
+
+pv:
+  # REQUIRED INPUT: PV 1 kWp reference profile (raw PVGIS output)
+  pvgis_1kw_file: "data/raw/pvgis/pvgis_1kw_seville_2025.csv"  # REQUIRED INPUT
+
+prices:
+  # REQUIRED INPUT: OMIE wholesale price series (raw)
+  omie_file: "data/raw/omie/omie_2025.csv"  # REQUIRED INPUT
+  # REQUIRED INPUT: PVPC import and export series (raw)
+  pvpc_import_file: "data/raw/pvpc_import/pvpc_import_2025.csv"  # REQUIRED INPUT
+  pvpc_export_file: "data/raw/pvpc_export/pvpc_export_2025.csv"  # REQUIRED INPUT
+
+allocation:
+  method: "annual_demand_proportional"
+
+battery:
+  # Baseline battery parameters (can be overridden in scenario list)
+  E_nom_kwh: 150
+  round_trip_eff: 0.90
+  depth_of_discharge: 0.90
+  S_init_kwh: 75
+  S_min_kwh: 15
+  charge_discharge_power_kw: 75
+
+economics:
+  discount_rate_real: 0.04
+  project_horizon_years: 15
+  pv_capex_eur_per_kwp: 1000
+  bess_capex_eur_per_kwh: 450
+  pv_opex_eur_per_kwp_yr: 15
+
+scenarios:
+  - name: baseline_pv_only
+    P_PV_kw: 50
+    E_BESS_kwh: 0
+    run: true
+  - name: baseline_pv_bess
+    P_PV_kw: 50
+    E_BESS_kwh: 150
+    run: true

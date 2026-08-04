@@ -1,0 +1,29 @@
+# Sensitivity analysis scenario register template
+
+# Define multiple scenario axes such as PV penetration, BESS size, BESS CAPEX and price scenarios.
+
+pv_penetration_kw:
+  - 10
+  - 25
+  - 50
+  - 100
+
+bess_capacity_kwh:
+  - 0
+  - 50
+  - 150
+  - 300
+
+bess_capex_eur_per_kwh:
+  - 350
+  - 450
+  - 550
+
+price_scenarios:
+  - name: baseline_prices
+    omie_file: "data/raw/omie/omie_2025.csv"
+    pvpc_import_file: "data/raw/pvpc_import/pvpc_import_2025.csv"
+    pvpc_export_file: "data/raw/pvpc_export/pvpc_export_2025.csv"
+  # Add alternative price scenarios with different files (REQUIRED INPUT if used)
+
+# Example combined scenario generator will create cartesian product of these axes.
