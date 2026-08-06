@@ -1,0 +1,6 @@
+provider,source_file,start,end,native_resolution,observation_count,timezone,unit,missing_timestamps_2024,missing_timestamps_2025,duplicate_timestamps,final_role
+load,load_hourly.csv,2012-10-12T01:00:00,,1 days 00:00:00,UNKNOWN,Europe/Madrid,kwh,UNKNOWN,UNKNOWN,UNKNOWN,load
+pvgis,, , , ,0,,, , , ,pv
+omie,, , , ,0,,, , , ,price_omie
+pvpc_import,, , , ,0,,, , , ,price_pvpc_import
+pvpc_export,, , , ,0,,, , , ,price_pvpc_export

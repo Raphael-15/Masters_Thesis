@@ -1,0 +1,6 @@
+# simulation calendar decision (created by audit)
+simulation_year: null
+calendar_ready: false
+timezone: Europe/Madrid
+reason: OMIE, PVPC_import and/or PVPC_export price series are missing from data/raw; calendar not ready
+price_audits: {}
