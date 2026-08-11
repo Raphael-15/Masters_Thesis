@@ -1,6 +1,30 @@
-# simulation calendar decision (created by audit)
-simulation_year: null
-calendar_ready: false
 timezone: Europe/Madrid
-reason: OMIE, PVPC_import and/or PVPC_export price series are missing from data/raw; calendar not ready
-price_audits: {}
+candidate_years:
+- 2013
+selected_year: 2013
+calendar_ready: true
+approach: common_year
+selection_reason: 2013 selected as the common simulation year. The final processed
+  30-household load dataset contains 8,760 hourly observations per household, and
+  OMIE, PVPC import, PVPC export and PVGIS all provide complete 2013 hourly coverage.
+price_unit: EUR/MWh
+load_source_timezone: UTC
+load_behavior_timezone: Europe/London
+target_timezone: Europe/Madrid
+expected_hours: 8760
+load_households: 30
+load_complete_households: 30
+load_total_rows: 262800
+load_expected_rows: 262800
+load_complete: true
+load_reconstructed_hours: 11990
+load_reconstruction_share_percent: 4.562405
+load_metadata_valid: true
+joint_price_coverage_complete: true
+joint_spanish_inputs_complete: true
+joint_spanish_intersection_hours: 8760
+joint_spanish_union_hours: 8760
+representative_year_mapping_required: false
+load_alignment_note: London demand is a behavioural proxy. Source timestamps are GMT/UTC
+  and local behaviour is interpreted in Europe/London; the final simulation uses the
+  2013 Europe/Madrid calendar.
