@@ -1,0 +1,31 @@
+household_id,simulation_year,selected,profile_status,expected_hours,observed_hours,reconstructed_hours,reconstruction_share_percent,reconstruction_method,annual_demand_kwh
+MAC000002,2013,True,originally_complete,8760,8760,0,0.0,none,4217.1990003
+MAC000003,2013,True,originally_complete,8760,8760,0,0.0,none,6992.338003299999
+MAC000004,2013,True,originally_complete,8760,8760,0,0.0,none,617.1170000000001
+MAC000006,2013,True,originally_complete,8760,8760,0,0.0,none,1053.7689999999998
+MAC000007,2013,True,originally_complete,8760,8760,0,0.0,none,3420.4869993
+MAC000008,2013,True,long_gap_reconstructed,8760,7249,1511,17.248858447488587,2012 same-household median: same month + weekday + local hour + UTC offset; scaled to observed 2013 household demand level | 2012 same-household median: same month + weekday + local hour; UTC-offset fallback; scaled to observed 2013 household demand level,6336.762510593136
+MAC000009,2013,True,short_gap_reconstructed,8760,8756,4,0.045662100456621,same-household median: same weekday + same local hour within +/-4 weeks,3015.3965004
+MAC000010,2013,True,originally_complete,8760,8760,0,0.0,none,9314.6069971
+MAC000011,2013,True,originally_complete,8760,8760,0,0.0,none,5246.955999899999
+MAC000012,2013,True,originally_complete,8760,8760,0,0.0,none,808.3009998
+MAC000013,2013,True,originally_complete,8760,8760,0,0.0,none,1771.304
+MAC000016,2013,True,long_gap_reconstructed,8760,361,8399,95.87899543378995,2012 same-household median: same month + weekday + local hour + UTC offset; scaled to observed 2013 household demand level | 2012 same-household median: same month + weekday + local hour; UTC-offset fallback; scaled to observed 2013 household demand level,87.5665287784037
+MAC000018,2013,True,originally_complete,8760,8760,0,0.0,none,3721.8729999
+MAC000019,2013,True,originally_complete,8760,8760,0,0.0,none,2309.7099998999997
+MAC000020,2013,True,originally_complete,8760,8760,0,0.0,none,2205.2190003
+MAC000021,2013,True,originally_complete,8760,8760,0,0.0,none,8089.339
+MAC000022,2013,True,originally_complete,8760,8760,0,0.0,none,4484.9950001
+MAC000023,2013,True,originally_complete,8760,8760,0,0.0,none,5022.0669997
+MAC000024,2013,True,originally_complete,8760,8760,0,0.0,none,7519.8649961
+MAC000025,2013,True,originally_complete,8760,8760,0,0.0,none,1834.3819998
+MAC000026,2013,True,short_gap_reconstructed,8760,8756,4,0.045662100456621,same-household median: same weekday + same local hour within +/-4 weeks,4358.0144995
+MAC000027,2013,True,originally_complete,8760,8760,0,0.0,none,3175.5690001000003
+MAC000028,2013,True,long_gap_reconstructed,8760,6697,2063,23.550228310502284,2012 same-household median: same month + weekday + local hour + UTC offset; scaled to observed 2013 household demand level | 2012 same-household median: same month + weekday + local hour; UTC-offset fallback; scaled to observed 2013 household demand level,1322.495834476499
+MAC000029,2013,True,short_gap_reconstructed,8760,8755,5,0.05707762557077625,same-household median: same weekday + same local hour within +/-4 weeks,1145.0240002000003
+MAC000030,2013,True,short_gap_reconstructed,8760,8756,4,0.045662100456621,same-household median: same weekday + same local hour within +/-4 weeks,4224.365999000001
+MAC000032,2013,True,originally_complete,8760,8760,0,0.0,none,4688.9989964
+MAC000033,2013,True,originally_complete,8760,8760,0,0.0,none,2748.7990001999997
+MAC000034,2013,True,originally_complete,8760,8760,0,0.0,none,8795.3469997
+MAC000035,2013,True,originally_complete,8760,8760,0,0.0,none,8162.5900014
+MAC000036,2013,True,originally_complete,8760,8760,0,0.0,none,965.608

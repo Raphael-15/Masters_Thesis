@@ -1,0 +1,2 @@
+household_id,simulation_year,selected,reason
+MAC000037,2013,False,Excluded from final 30-household sample because the available profile exhibited extremely low electricity consumption and substantial missing 2013 coverage.
