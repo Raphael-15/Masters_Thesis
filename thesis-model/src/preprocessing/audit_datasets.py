@@ -252,7 +252,12 @@ def audit_final_load():
         )
 
     load = pd.read_csv(
-        FINAL_LOAD_FILE
+        FINAL_LOAD_FILE,
+        dtype={
+            "household_id": "string",
+            "reconstruction_method": "string",
+        },
+        low_memory=False,
     )
 
     load.columns = (
