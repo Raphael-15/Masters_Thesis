@@ -338,11 +338,39 @@ def process_dataset(dataset_type: str, input_dir: Path, output_file: Path, unit_
             manifest_rows.append(build_raw_file_manifest_row(p, sha, enc if 'enc' in locals() else None, sep if 'sep' in locals() else None, pd.DataFrame(), group_id, str(p), "error", [str(e)]))
             continue
     if len(canonical_processed) == 0:
-        msg_lines = ["No canonical input files processed successfully."]
-        if canonical_errors:
-            for p, e in canonical_errors:
-                msg_lines.append(f"Canonical file error: {p} -> {type(e).__name__}: {e}")
-        raise RuntimeError("\n".join(msg_lines))
+
+    # Preserve validation errors as ValueError so callers/tests
+    # can distinguish invalid input data from runtime failures.
+    if canonical_errors:
+
+        # If there is a single canonical input and its failure
+        # is a validation error, re-raise that original error.
+        if (
+            len(canonical_errors) == 1
+            and isinstance(
+                canonical_errors[0][1],
+                ValueError
+            )
+        ):
+            raise canonical_errors[0][1]
+
+        msg_lines = [
+            "No canonical input files processed successfully."
+        ]
+
+        for p, e in canonical_errors:
+            msg_lines.append(
+                f"Canonical file error: {p} -> "
+                f"{type(e).__name__}: {e}"
+            )
+
+        raise RuntimeError(
+            "\n".join(msg_lines)
+        )
+
+    raise RuntimeError(
+        "No canonical input files processed successfully."
+    )
     concatenated = []
     for p, sha, df, group_id, series_names, geonames in canonical_processed:
         df["timestamp_utc"] = pd.to_datetime(df["timestamp_utc"], utc=True, errors="raise")
