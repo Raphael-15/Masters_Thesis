@@ -1,0 +1,4 @@
+consumption_cluster,households,minimum_annual_consumption_kwh,mean_annual_consumption_kwh,maximum_annual_consumption_kwh,total_annual_consumption_kwh,reconstructed_hours
+low,10,87.56652877840341,1181.0786363354903,2205.2190003,11810.786363354902,10467
+medium,10,2309.7099998999997,3567.64089987,4484.9950001,35676.4089987,12
+high,10,4688.9989964,7016.887050419314,9314.6069971,70168.87050419314,1511
