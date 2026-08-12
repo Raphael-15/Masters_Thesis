@@ -1,0 +1,82 @@
+phase: 3
+status: complete
+ready_for_phase4: true
+simulation_calendar:
+  year: 2013
+  timezone: Europe/Madrid
+  timestep: 1h
+  hours: 8760
+community:
+  community_id: SEVILLE_CSC_001
+  number_of_members: 30
+  community_size_fixed: true
+  community_composition_case: baseline_empirical_30_members
+  annual_demand_kwh: 117656.06586624803
+  allocation_method: annual_demand_proportional
+  allocation_coefficient_sum: 0.9999999999999983
+  consumption_clusters:
+    low: 10
+    medium: 10
+    high: 10
+load_provenance:
+  source_timestamp_timezone: UTC
+  behavioural_timezone: Europe/London
+  simulation_timezone: Europe/Madrid
+  temporal_alignment_method: timezone_aware_calendar_position_Europe_London_to_Europe_Madrid
+  reconstructed_hours: 11990
+  demand_rescaling_performed: false
+pv:
+  profile_unit: kWh/kWp per hour
+  annual_yield_kwh_per_kwp: 1564.4031799999998
+  scenario_capacity_kwp: &id001
+  - 10.0
+  - 25.0
+  - 50.0
+  - 100.0
+prices:
+  storage_unit: EUR/MWh
+  omie_role: dispatch_signal_only
+  pvpc_import_role: grid_import_billing
+  pvpc_export_role: simplified_export_compensation
+  negative_omie_values_retained: true
+  negative_omie_hours: 247
+scenario_register:
+  total_scenarios: 17
+  no_der: 1
+  pv_only: 4
+  pv_bess: 12
+  pv_capacity_kwp: *id001
+  battery_capacity_kwh: 150.0
+  battery_capacity_is_sensitivity: false
+  battery_capex_eur_per_kwh:
+  - 350.0
+  - 450.0
+  - 550.0
+  community_size_is_sensitivity: false
+  reference_scenarios:
+  - NO_DER_REFERENCE
+  - PV_ONLY_PV050
+  - PV_BESS_PV050_CAPEX450
+settlement_contract:
+  compensation_cap_case: rd244_monthly_participant_cap
+  cap_application_level: participant_month
+  carryover: false
+authoritative_model_inputs:
+  hourly_member_inputs: data/gold/hourly_member_inputs_2013.csv
+  community_configuration: data/gold/community_configuration_2013.csv
+  scenario_parameters: data/gold/scenario_parameters_2013.csv
+  household_metadata: data/gold/metadata/household_metadata_2013.csv
+  spanish_hourly_inputs: data/gold/metadata/spanish_hourly_inputs_2013.csv
+  calendar_mapping: data/gold/metadata/london_to_madrid_calendar_map_2013.csv
+validation:
+  gold_rows: 262800
+  members: 30
+  hours_per_member: 8760
+  missing_model_hours: 0
+  extra_model_hours: 0
+  duplicate_member_hours: 0
+  core_null_values: 0
+  tests_expected: 28
+legacy_config_note: config/baseline.yaml and config/sensitivity.yaml are earlier templates
+  and are not authoritative Phase-3 model inputs. Use this handover file and the Gold
+  scenario register for Phase 4.
